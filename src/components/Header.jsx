@@ -1,96 +1,288 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FiMap, FiUser, FiSettings, FiBell, FiLogOut, FiMenu, FiX, FiHome, FiBatteryCharging, FiUsers, FiMessageSquare, FiNavigation, FiShield, FiMessageCircle, FiCreditCard, FiShoppingCart, FiGlobe, FiDollarSign } from 'react-icons/fi';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiMap, FiUser, FiSettings, FiBell, FiLogOut, FiMenu, FiX, FiHome, FiBatteryCharging, FiUsers, FiMessageSquare, FiNavigation, FiShield } from 'react-icons/fi';
-import { motion } from 'framer-motion';
 import LanguageSwitch from './LanguageSwitch';
 
 const Header = ({ language, setLanguage, subscription }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [unreadNotifications, setUnreadNotifications] = useState(3);
   const navigate = useNavigate();
 
+  const logoUrl = "https://media.licdn.com/dms/image/v2/D4D22AQG0Atyt2w2ZFQ/feedshare-shrink_800/B4DZsegFI0K8Ag-/0/1765743287150?e=1769644800&v=beta&t=V7uxIxe8F4wdKGtZV1dK5Es4vQeMVFohcxtotEeb-Yw";
+  const profileImage = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80";
+
   const navItems = [
-    { path: '/', icon: <FiHome />, label: 'Dashboard' },
-    { path: '/v2v', icon: <FiMessageSquare />, label: 'V2V Network' },
-    { path: '/smart-map', icon: <FiNavigation />, label: 'Smart Map' },
-    { path: '/routes', icon: <FiMap />, label: 'Routes' },
-    { path: '/ev-charging', icon: <FiBatteryCharging />, label: 'EV Charging' },
-    { path: '/government-insurance', icon: <FiShield />, label: 'Gov & Insurance' },
-    { path: '/community', icon: <FiUsers />, label: 'Community' },
-    { path: '/social', icon: <FiMessageSquare />, label: 'Social' },
-    { path: '/profile', icon: <FiUser />, label: 'Profile' },
-    { path: '/settings', icon: <FiSettings />, label: 'Settings' },
+    { path: '/', icon: <FiHome />, label: 'Dashboard', color: 'text-blue-400' },
+    { path: '/smart-map', icon: <FiMap />, label: 'Smart Map', color: 'text-green-400' },
+    { path: '/v2v', icon: <FiNavigation />, label: 'V2V Connect', color: 'text-purple-400' },
+    { path: '/ev-charging', icon: <FiBatteryCharging />, label: 'EV Charging', color: 'text-yellow-400' },
+    { path: '/community', icon: <FiUsers />, label: 'Community', color: 'text-pink-400' },
+    { path: '/social', icon: <FiMessageSquare />, label: 'Social', color: 'text-indigo-400' },
+    { path: '/ai-assistant', icon: <FiMessageCircle />, label: 'AI Assistant', color: 'text-cyan-400' },
+    { path: '/government-insurance', icon: <FiShield />, label: 'Insurance', color: 'text-red-400' },
+    { path: '/subscription', icon: <FiCreditCard />, label: 'Subscription', color: 'text-orange-400' },
+    { path: '/payment', icon: <FiDollarSign />, label: 'Payment', color: 'text-green-400' },
+    { path: '/settings', icon: <FiSettings />, label: 'Settings', color: 'text-gray-400' },
   ];
 
   const handleLogout = () => {
     localStorage.removeItem('njiasafe_token');
+    localStorage.removeItem('njiasafe_subscription');
+    localStorage.removeItem('njiasafe_language');
     navigate('/login');
   };
 
-  return (
-    <motion.header initial={{ y: -100 }} animate={{ y: 0 }} className="fixed top-0 left-0 right-0 bg-premium-card/90 backdrop-blur-lg border-b border-njia-orange/20 z-50">
-      <div className="container mx-auto px-4 py-3">
-        <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="relative">
-              <div className="w-10 h-10 bg-gradient-to-br from-njia-darkblue to-njia-purple rounded-lg flex items-center justify-center">
-                <span className="text-xl font-bold"><span className="text-white">NJIA</span></span>
-              </div>
-              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-njia-orange rounded-full animate-pulse-glow"></div>
-            </div>
-            <div>
-              <h1 className="text-xl font-bold"><span className="text-njia-darkblue">NJIA</span><span className="text-njia-orange">SAFE</span></h1>
-              <div className="flex items-center space-x-2">
-                <span className={`text-xs px-2 py-0.5 rounded ${subscription === 'premium' ? 'bg-gradient-to-r from-yellow-500 to-orange-500' : 'bg-gray-600'}`}>
-                  {subscription === 'premium' ? 'PREMIUM' : 'FREE'}
-                </span>
-                <p className="text-xs text-gray-400">Premium Safe Routes</p>
-              </div>
-            </div>
-          </Link>
+  const handleNotificationClick = () => {
+    setUnreadNotifications(0);
+    navigate('/notifications');
+  };
 
-          <nav className="hidden md:flex items-center space-x-6">
+  return (
+    <header className="fixed top-0 left-0 right-0 z-50 bg-gray-950/90 backdrop-blur-lg border-b border-gray-800">
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex items-center justify-between">
+          {/* Logo and Menu Button */}
+          <div className="flex items-center space-x-4">
+            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="lg:hidden text-gray-400 hover:text-white">
+              {isMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
+            </button>
+            
+            <Link to="/" className="flex items-center space-x-3">
+              {/* Circular Logo */}
+              <div className="relative w-10 h-10">
+                {/* Animated border */}
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-0 border border-transparent rounded-full"
+                  style={{
+                    background: 'conic-gradient(from 0deg, #1e3a8a, #8b5cf6, #f59e0b, #1e3a8a)',
+                    WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                    WebkitMaskComposite: 'xor',
+                    maskComposite: 'exclude',
+                    padding: '1px',
+                  }}
+                />
+                
+                {/* Logo Image */}
+                <div className="absolute inset-1 rounded-full overflow-hidden bg-gray-900 flex items-center justify-center">
+                  <img 
+                    src={logoUrl}
+                    alt="NJIA SAFE Logo" 
+                    className="w-full h-full object-contain p-1"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.style.display = 'none';
+                      // Fallback to text
+                      const fallback = document.createElement('div');
+                      fallback.className = 'flex items-center justify-center h-full w-full';
+                      fallback.innerHTML = `
+                        <div class="text-xs font-bold">
+                          <span class="text-njia-darkblue">N</span>
+                          <span class="text-njia-orange">S</span>
+                        </div>
+                      `;
+                      e.target.parentNode.appendChild(fallback);
+                    }}
+                  />
+                </div>
+              </div>
+              
+              {/* App Name */}
+              <div className="hidden md:block">
+                <h1 className="text-xl font-bold">
+                  <span className="text-njia-darkblue">NJIA</span>
+                  <span className="text-njia-orange"> SAFE</span>
+                </h1>
+                <p className="text-xs text-gray-400">Smart Navigation Built for Africa</p>
+              </div>
+            </Link>
+          </div>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center space-x-1">
             {navItems.slice(0, 6).map((item) => (
-              <Link key={item.path} to={item.path} className="flex items-center space-x-2 text-gray-300 hover:text-njia-orange transition-colors group">
-                <span className="group-hover:scale-110 transition-transform">{item.icon}</span>
-                <span className="text-sm font-medium">{item.label}</span>
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`px-4 py-2 rounded-lg transition-all flex items-center space-x-2 ${
+                  window.location.pathname === item.path
+                    ? 'bg-gray-800 text-white'
+                    : 'text-gray-400 hover:text-white hover:bg-gray-800/50'
+                }`}
+              >
+                <span className={item.color}>{item.icon}</span>
+                <span className="font-medium">{item.label}</span>
               </Link>
             ))}
           </nav>
 
-          <div className="flex items-center space-x-4">
-            <LanguageSwitch language={language} setLanguage={setLanguage} />
-            <Link to="/subscription" className={`px-3 py-1.5 rounded-lg text-sm font-medium ${subscription === 'premium' ? 'bg-gradient-to-r from-yellow-500 to-orange-500' : 'bg-gradient-to-r from-njia-darkblue to-njia-purple'}`}>
-              {subscription === 'premium' ? '⭐ Premium' : '🆓 Free'}
-            </Link>
-            <button onClick={() => {}} className="relative p-2 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors">
-              <FiBell className="w-5 h-5" />
-              <span className="absolute -top-1 -right-1 w-2 h-2 bg-njia-orange rounded-full animate-pulse"></span>
+          {/* Right Side Actions */}
+          <div className="flex items-center space-x-3">
+            {/* Language Switch */}
+            <div className="hidden md:block">
+              <LanguageSwitch language={language} setLanguage={setLanguage} />
+            </div>
+
+            {/* Notifications */}
+            <button
+              onClick={handleNotificationClick}
+              className="relative p-2 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors"
+            >
+              <FiBell className="text-gray-300" />
+              {unreadNotifications > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-xs rounded-full flex items-center justify-center animate-pulse">
+                  {unreadNotifications}
+                </span>
+              )}
             </button>
-            <button onClick={handleLogout} className="hidden md:flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-njia-darkblue to-njia-purple rounded-lg hover:opacity-90 transition-opacity">
-              <FiLogOut /><span>Logout</span>
-            </button>
-            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="md:hidden p-2 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors">
-              {isMenuOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
-            </button>
+
+            {/* Profile Menu */}
+            <div className="relative">
+              <button
+                onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                className="flex items-center space-x-3 p-2 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors"
+              >
+                <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-njia-orange">
+                  <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+                </div>
+                <div className="hidden md:block text-left">
+                  <p className="text-sm font-medium">Premium User</p>
+                  <p className="text-xs text-gray-400 capitalize">{subscription}</p>
+                </div>
+              </button>
+
+              <AnimatePresence>
+                {isProfileMenuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    className="absolute right-0 mt-2 w-64 bg-gray-900 rounded-xl shadow-2xl border border-gray-800 overflow-hidden z-50"
+                  >
+                    <div className="p-4 border-b border-gray-800">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-njia-orange">
+                          <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+                        </div>
+                        <div>
+                          <p className="font-bold">John Doe</p>
+                          <p className="text-sm text-gray-400">Premium Member</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-2">
+                      <Link
+                        to="/profile"
+                        className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors"
+                      >
+                        <FiUser className="text-gray-400" />
+                        <span>My Profile</span>
+                      </Link>
+                      <Link
+                        to="/settings"
+                        className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors"
+                      >
+                        <FiSettings className="text-gray-400" />
+                        <span>Settings</span>
+                      </Link>
+                      <Link
+                        to="/subscription"
+                        className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors"
+                      >
+                        <FiCreditCard className="text-gray-400" />
+                        <span>Subscription</span>
+                      </Link>
+                      <Link
+                        to="/payment"
+                        className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors"
+                      >
+                        <FiDollarSign className="text-gray-400" />
+                        <span>Make Payment</span>
+                      </Link>
+                      <Link
+                        to="/government-insurance"
+                        className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors"
+                      >
+                        <FiShield className="text-gray-400" />
+                        <span>Insurance</span>
+                      </Link>
+                    </div>
+
+                    <div className="p-4 border-t border-gray-800">
+                      <div className="flex items-center space-x-2 mb-3">
+                        <FiGlobe className="text-gray-400" />
+                        <span className="text-sm text-gray-400">Language:</span>
+                        <div className="ml-auto">
+                          <LanguageSwitch language={language} setLanguage={setLanguage} />
+                        </div>
+                      </div>
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center justify-center space-x-2 w-full px-4 py-3 bg-gradient-to-r from-njia-darkblue to-njia-purple rounded-lg hover:opacity-90 transition-opacity"
+                      >
+                        <FiLogOut className="w-4 h-4" />
+                        <span>Logout</span>
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
         </div>
 
-        {isMenuOpen && (
-          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="md:hidden mt-4 pb-4 border-t border-gray-800 pt-4">
-            <div className="flex flex-col space-y-3">
-              {navItems.map((item) => (
-                <Link key={item.path} to={item.path} onClick={() => setIsMenuOpen(false)} className="flex items-center space-x-3 px-4 py-3 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors">
-                  {item.icon}<span>{item.label}</span>
-                </Link>
-              ))}
-              <button onClick={handleLogout} className="flex items-center justify-center space-x-2 px-4 py-3 bg-gradient-to-r from-njia-darkblue to-njia-purple rounded-lg hover:opacity-90 transition-opacity">
-                <FiLogOut /><span>Logout</span>
-              </button>
-            </div>
-          </motion.div>
-        )}
+        {/* Mobile Navigation */}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="lg:hidden overflow-hidden"
+            >
+              <div className="pt-4 pb-2 border-t border-gray-800 mt-4">
+                {/* Mobile Language Switch */}
+                <div className="mb-4 px-2">
+                  <LanguageSwitch language={language} setLanguage={setLanguage} />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-2">
+                  {navItems.map((item) => (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      onClick={() => setIsMenuOpen(false)}
+                      className={`flex items-center space-x-2 px-4 py-3 rounded-lg transition-all ${
+                        window.location.pathname === item.path
+                          ? 'bg-gray-800 text-white'
+                          : 'text-gray-400 hover:text-white hover:bg-gray-800/50'
+                      }`}
+                    >
+                      <span className={item.color}>{item.icon}</span>
+                      <span>{item.label}</span>
+                    </Link>
+                  ))}
+                </div>
+                
+                <div className="mt-4 pt-4 border-t border-gray-800">
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center justify-center space-x-2 w-full px-4 py-3 bg-gradient-to-r from-njia-darkblue to-njia-purple rounded-lg hover:opacity-90 transition-opacity"
+                  >
+                    <FiLogOut /><span>Logout</span>
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-    </motion.header>
+    </header>
   );
 };
+
 export default Header;

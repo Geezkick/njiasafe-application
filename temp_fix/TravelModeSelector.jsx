@@ -1,12 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FiTruck, FiUser, FiActivity, FiNavigation } from 'react-icons/fi';
+import { FiCar, FiUser, FiBicycle, FiNavigation } from 'react-icons/fi';
 
 const TravelModeSelector = ({ mode, setMode }) => {
   const modes = [
-    { id: 'drive', label: 'Drive', icon: <FiTruck />, color: 'from-njia-darkblue to-blue-600' },
+    { id: 'drive', label: 'Drive', icon: <FiCar />, color: 'from-njia-darkblue to-blue-600' },
     { id: 'walk', label: 'Walk', icon: <FiUser />, color: 'from-njia-orange to-orange-500' },
-    { id: 'cycle', label: 'Cycle', icon: <FiActivity />, color: 'from-njia-purple to-purple-500' },
+    { id: 'cycle', label: 'Cycle', icon: <FiBicycle />, color: 'from-njia-purple to-purple-500' },
     { id: 'transit', label: 'Transit', icon: <FiNavigation />, color: 'from-green-500 to-emerald-500' }
   ];
 

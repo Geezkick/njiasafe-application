@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FiUsers, FiMessageSquare, FiMapPin, FiBell, FiShield, FiStar, FiTrendingUp, FiHeart, FiSend, FiAlertCircle, FiCheckCircle } from 'react-icons/fi';
+import { FiUsers, FiMessageSquare, FiMapPin, FiBell, FiShield, FiStar, FiTrendingUp, FiHeart, FiSend, FiAlertCircle } from 'react-icons/fi';
 import AnimatedButton from '../components/AnimatedButton';
 
 const Community = () => {

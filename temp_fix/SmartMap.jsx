@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FiMap, FiNavigation, FiFilter, FiLayers, FiSearch, FiAlertTriangle, FiEye, FiEyeOff, FiSettings, FiDownload, FiShare2, FiTarget, FiZoomIn, FiZoomOut } from 'react-icons/fi';
+import { FiMap, FiNavigation, FiFilter, FiLayers, FiSearch, FiAlertTriangle, FiEye, FiEyeOff, FiSettings, FiDownload, FiShare2, FiTarget } from 'react-icons/fi';
 import AnimatedButton from '../components/AnimatedButton';
 
 const SmartMap = ({ subscription }) => {
