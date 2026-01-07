@@ -43,7 +43,7 @@ function App() {
     <div className="min-h-screen bg-gradient-to-br from-premium-dark via-gray-900 to-gray-900 text-white">
       <Toaster position="top-right" toastOptions={{ style: { background: '#1a1f36', color: '#fff', border: '1px solid #ff6d00' } }} />
       {isAuthenticated && <Header language={language} setLanguage={setLanguage} subscription={subscription} />}
-      <main className={`${isAuthenticated ? 'pt-16' : ''} min-h-screen`}>
+      <main className={`${isAuthenticated ? 'pt-28 pb-8' : 'pt-0 pb-8'} min-h-screen`}>
         <Routes>
           <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
           <Route path="/register" element={<Register />} />

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiMap, FiUser, FiSettings, FiBell, FiLogOut, FiMenu, FiX, FiHome, FiBatteryCharging, FiUsers, FiMessageSquare, FiNavigation, FiShield, FiMessageCircle, FiCreditCard, FiShoppingCart, FiGlobe, FiDollarSign } from 'react-icons/fi';
-import { Link, useNavigate } from 'react-router-dom';
+import { FiMap, FiUser, FiSettings, FiBell, FiLogOut, FiMenu, FiX, FiHome, FiBatteryCharging, FiUsers, FiMessageSquare, FiNavigation, FiGlobe, FiRadio } from 'react-icons/fi';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import LanguageSwitch from './LanguageSwitch';
 
 const Header = ({ language, setLanguage, subscription }) => {
@@ -12,12 +12,13 @@ const Header = ({ language, setLanguage, subscription }) => {
   const [userSubscription, setUserSubscription] = useState('free');
   const [profileImage, setProfileImage] = useState('https://api.dicebear.com/7.x/avataaars/svg?seed=brian');
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const logoUrl = "/logos/logo.svg";
+  // LinkedIn image URL for the logo
+  const logoUrl = "https://media.licdn.com/dms/image/v2/D4D22AQG0Atyt2w2ZFQ/feedshare-shrink_800/B4DZsegFI0K8Ag-/0/1765743287150?e=1769644800&v=beta&t=V7uxIxe8F4wdKGtZV1dK5Es4vQeMVFohcxtotEeb-Yw";
 
-  // Load user data from localStorage to match UserProfile.jsx
+  // Load user data from localStorage
   useEffect(() => {
-    // Load saved user data
     const userData = localStorage.getItem('njiasafe_user');
     if (userData) {
       try {
@@ -29,31 +30,61 @@ const Header = ({ language, setLanguage, subscription }) => {
       }
     }
 
-    // Load saved profile image from localStorage (same as UserProfile.jsx)
     const savedImage = localStorage.getItem('njiasafe_profile_image');
     if (savedImage) {
       setProfileImage(savedImage);
     }
 
-    // Load subscription from localStorage
     const userSub = localStorage.getItem('njiasafe_subscription');
     if (userSub) {
       setUserSubscription(userSub);
     }
   }, [subscription]);
 
+  // ONLY the requested navigation items
   const navItems = [
-    { path: '/', icon: <FiHome />, label: 'Dashboard', color: 'text-blue-400' },
-    { path: '/smart-map', icon: <FiMap />, label: 'Smart Map', color: 'text-green-400' },
-    { path: '/v2v', icon: <FiNavigation />, label: 'V2V Connect', color: 'text-purple-400' },
-    { path: '/ev-charging', icon: <FiBatteryCharging />, label: 'EV Charging', color: 'text-yellow-400' },
-    { path: '/community', icon: <FiUsers />, label: 'Community', color: 'text-pink-400' },
-    { path: '/social', icon: <FiMessageSquare />, label: 'Social', color: 'text-indigo-400' },
-    { path: '/ai-assistant', icon: <FiMessageCircle />, label: 'AI Assistant', color: 'text-cyan-400' },
-    { path: '/government-insurance', icon: <FiShield />, label: 'Insurance', color: 'text-red-400' },
-    { path: '/subscription', icon: <FiCreditCard />, label: 'Subscription', color: 'text-orange-400' },
-    { path: '/payment', icon: <FiDollarSign />, label: 'Payment', color: 'text-green-400' },
-    { path: '/settings', icon: <FiSettings />, label: 'Settings', color: 'text-gray-400' },
+    { 
+      path: '/', 
+      icon: <FiHome />, 
+      label: 'Dashboard', 
+      description: 'Overview',
+      color: 'text-blue-400'
+    },
+    { 
+      path: '/smart-map', 
+      icon: <FiMap />, 
+      label: 'Smart Map', 
+      description: 'Interactive Maps',
+      color: 'text-green-400'
+    },
+    { 
+      path: '/v2v', 
+      icon: <FiRadio />, 
+      label: 'V2V Connect', 
+      description: 'Vehicle Network',
+      color: 'text-purple-400'
+    },
+    { 
+      path: '/ev-charging', 
+      icon: <FiBatteryCharging />, 
+      label: 'EV Charging', 
+      description: 'Charging Stations',
+      color: 'text-yellow-400'
+    },
+    { 
+      path: '/community', 
+      icon: <FiUsers />, 
+      label: 'Community', 
+      description: 'User Community',
+      color: 'text-pink-400'
+    },
+    { 
+      path: '/social', 
+      icon: <FiMessageSquare />, 
+      label: 'Social', 
+      description: 'Social Platform',
+      color: 'text-indigo-400'
+    }
   ];
 
   const handleLogout = () => {
@@ -77,52 +108,57 @@ const Header = ({ language, setLanguage, subscription }) => {
     }
   };
 
+  // Check if a path is active
+  const isActive = (path) => {
+    return location.pathname === path;
+  };
+
+  // Format welcome message with user's first name
+  const getWelcomeMessage = () => {
+    const firstName = userName.split(' ')[0];
+    return `Welcome back, ${firstName}!`;
+  };
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-gray-950/90 backdrop-blur-lg border-b border-gray-800">
-      <div className="container mx-auto px-4 py-4">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-gray-950/95 backdrop-blur-xl border-b border-gray-800 shadow-2xl">
+      <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
+          
           {/* Logo and Menu Button */}
           <div className="flex items-center space-x-4">
-            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="lg:hidden text-gray-400 hover:text-white">
+            <button 
+              onClick={() => setIsMenuOpen(!isMenuOpen)} 
+              className="lg:hidden text-gray-400 hover:text-white p-2 rounded-lg hover:bg-gray-800"
+            >
               {isMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
             </button>
             
-            <Link to="/" className="flex items-center space-x-3">
-              {/* Circular Logo */}
+            <Link to="/" className="flex items-center space-x-3 group">
+              {/* Circular Logo with LinkedIn image */}
               <div className="relative w-10 h-10">
                 {/* Animated border */}
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                  className="absolute inset-0 border border-transparent rounded-full"
+                  className="absolute inset-0 border-2 border-transparent rounded-full"
                   style={{
                     background: 'conic-gradient(from 0deg, #1e3a8a, #8b5cf6, #f59e0b, #1e3a8a)',
                     WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
                     WebkitMaskComposite: 'xor',
                     maskComposite: 'exclude',
-                    padding: '1px',
+                    padding: '2px',
                   }}
                 />
                 
-                {/* Logo Image */}
-                <div className="absolute inset-1 rounded-full overflow-hidden bg-gray-900 flex items-center justify-center">
+                {/* LinkedIn Image */}
+                <div className="absolute inset-1 rounded-full overflow-hidden bg-white flex items-center justify-center">
                   <img 
                     src={logoUrl}
                     alt="NJIA SAFE Logo" 
-                    className="w-full h-full object-contain p-1"
+                    className="w-full h-full object-cover"
                     onError={(e) => {
                       e.target.onerror = null;
-                      e.target.style.display = 'none';
-                      // Fallback to text
-                      const fallback = document.createElement('div');
-                      fallback.className = 'flex items-center justify-center h-full w-full';
-                      fallback.innerHTML = `
-                        <div class="text-xs font-bold">
-                          <span class="text-njia-darkblue">N</span>
-                          <span class="text-njia-orange">S</span>
-                        </div>
-                      `;
-                      e.target.parentNode.appendChild(fallback);
+                      e.target.src = '/logos/logo.svg';
                     }}
                   />
                 </div>
@@ -130,36 +166,52 @@ const Header = ({ language, setLanguage, subscription }) => {
               
               {/* App Name */}
               <div className="hidden md:block">
-                <h1 className="text-xl font-bold">
-                  <span className="text-njia-darkblue">NJIA</span>
-                  <span className="text-njia-orange"> SAFE</span>
+                <h1 className="text-xl font-bold tracking-tight">
+                  <span className="text-blue-400">NJIA</span>
+                  <span className="text-orange-500"> SAFE</span>
                 </h1>
-                <p className="text-xs text-gray-400">Smart Navigation Built for Africa</p>
+                <p className="text-xs text-gray-400">{getWelcomeMessage()}</p>
               </div>
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation - ONLY requested items, all visible */}
           <nav className="hidden lg:flex items-center space-x-1">
-            {navItems.slice(0, 6).map((item) => (
+            {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`px-4 py-2 rounded-lg transition-all flex items-center space-x-2 ${
-                  window.location.pathname === item.path
-                    ? 'bg-gray-800 text-white'
-                    : 'text-gray-400 hover:text-white hover:bg-gray-800/50'
-                }`}
+                className={`
+                  relative group flex flex-col items-center px-4 py-3 rounded-xl transition-all duration-300
+                  min-w-[110px] mx-0.5
+                  ${isActive(item.path) 
+                    ? 'bg-gradient-to-br from-blue-900/30 to-purple-900/30 text-white border border-blue-500/30' 
+                    : 'text-gray-300 hover:text-white hover:bg-gray-800/50'
+                  }
+                `}
               >
-                <span className={item.color}>{item.icon}</span>
-                <span className="font-medium">{item.label}</span>
+                <div className={`flex items-center space-x-2 ${item.color}`}>
+                  <span className="text-lg">{item.icon}</span>
+                  <span className="font-semibold">{item.label}</span>
+                </div>
+                <span className="text-xs text-gray-400 mt-1 opacity-0 group-hover:opacity-100 transition-opacity truncate w-full text-center">
+                  {item.description}
+                </span>
+                
+                {/* Active indicator */}
+                {isActive(item.path) && (
+                  <motion.div
+                    layoutId="activeIndicator"
+                    className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-3/4 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-t-full"
+                  />
+                )}
               </Link>
             ))}
           </nav>
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-3">
-            {/* Language Switch */}
+            {/* Language Switch - Desktop */}
             <div className="hidden md:block">
               <LanguageSwitch language={language} setLanguage={setLanguage} />
             </div>
@@ -167,13 +219,17 @@ const Header = ({ language, setLanguage, subscription }) => {
             {/* Notifications */}
             <button
               onClick={handleNotificationClick}
-              className="relative p-2 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors"
+              className="relative p-3 rounded-xl bg-gray-800 hover:bg-gray-700 transition-all duration-300 group"
             >
-              <FiBell className="text-gray-300" />
+              <FiBell className="text-gray-300 group-hover:text-white text-lg" />
               {unreadNotifications > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-xs rounded-full flex items-center justify-center animate-pulse">
+                <motion.span 
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-xs rounded-full flex items-center justify-center animate-pulse border border-gray-900"
+                >
                   {unreadNotifications}
-                </span>
+                </motion.span>
               )}
             </button>
 
@@ -181,10 +237,10 @@ const Header = ({ language, setLanguage, subscription }) => {
             <div className="relative">
               <button
                 onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                className="flex items-center space-x-3 p-2 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors"
+                className="flex items-center space-x-3 p-2 rounded-xl bg-gray-800 hover:bg-gray-700 transition-all duration-300 group"
               >
-                {/* Profile image - same as UserProfile.jsx */}
-                <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-njia-orange">
+                {/* Profile image */}
+                <div className="w-9 h-9 rounded-full overflow-hidden border-2 border-orange-500/70 group-hover:border-orange-500 transition-colors">
                   <img 
                     src={profileImage} 
                     alt="Profile" 
@@ -196,7 +252,7 @@ const Header = ({ language, setLanguage, subscription }) => {
                   />
                 </div>
                 <div className="hidden md:block text-left">
-                  <p className="text-sm font-medium">{userName}</p>
+                  <p className="text-sm font-medium text-white">{userName}</p>
                   <p className="text-xs text-gray-400 capitalize">{getSubscriptionText()} Member</p>
                 </div>
               </button>
@@ -207,12 +263,11 @@ const Header = ({ language, setLanguage, subscription }) => {
                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    className="absolute right-0 mt-2 w-64 bg-gray-900 rounded-xl shadow-2xl border border-gray-800 overflow-hidden z-50"
+                    className="absolute right-0 mt-2 w-64 bg-gray-900/95 backdrop-blur-lg rounded-xl shadow-2xl border border-gray-800 overflow-hidden z-50"
                   >
                     <div className="p-4 border-b border-gray-800">
                       <div className="flex items-center space-x-3">
-                        {/* Larger profile image - same as UserProfile.jsx */}
-                        <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-njia-orange">
+                        <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-orange-500">
                           <img 
                             src={profileImage} 
                             alt="Profile" 
@@ -224,52 +279,30 @@ const Header = ({ language, setLanguage, subscription }) => {
                           />
                         </div>
                         <div>
-                          <p className="font-bold">{userName}</p>
+                          <p className="font-bold text-white">{userName}</p>
                           <p className="text-sm text-gray-400 capitalize">{getSubscriptionText()} Member</p>
+                          <p className="text-xs text-blue-400 mt-1">{getWelcomeMessage()}</p>
                         </div>
                       </div>
                     </div>
 
                     <div className="p-2">
+                      {/* Profile links - Minimal options */}
                       <Link
                         to="/profile"
                         onClick={() => setIsProfileMenuOpen(false)}
-                        className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors"
+                        className="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors mb-1"
                       >
-                        <FiUser className="text-gray-400" />
+                        <FiUser />
                         <span>My Profile</span>
                       </Link>
                       <Link
                         to="/settings"
                         onClick={() => setIsProfileMenuOpen(false)}
-                        className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors"
+                        className="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors mb-1"
                       >
-                        <FiSettings className="text-gray-400" />
+                        <FiSettings />
                         <span>Settings</span>
-                      </Link>
-                      <Link
-                        to="/subscription"
-                        onClick={() => setIsProfileMenuOpen(false)}
-                        className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors"
-                      >
-                        <FiCreditCard className="text-gray-400" />
-                        <span>Subscription</span>
-                      </Link>
-                      <Link
-                        to="/payment"
-                        onClick={() => setIsProfileMenuOpen(false)}
-                        className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors"
-                      >
-                        <FiDollarSign className="text-gray-400" />
-                        <span>Make Payment</span>
-                      </Link>
-                      <Link
-                        to="/government-insurance"
-                        onClick={() => setIsProfileMenuOpen(false)}
-                        className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors"
-                      >
-                        <FiShield className="text-gray-400" />
-                        <span>Insurance</span>
                       </Link>
                     </div>
 
@@ -283,7 +316,7 @@ const Header = ({ language, setLanguage, subscription }) => {
                       </div>
                       <button
                         onClick={handleLogout}
-                        className="flex items-center justify-center space-x-2 w-full px-4 py-3 bg-gradient-to-r from-njia-darkblue to-njia-purple rounded-lg hover:opacity-90 transition-opacity"
+                        className="flex items-center justify-center space-x-2 w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg hover:opacity-90 transition-opacity font-medium"
                       >
                         <FiLogOut className="w-4 h-4" />
                         <span>Logout</span>
@@ -303,36 +336,46 @@ const Header = ({ language, setLanguage, subscription }) => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="lg:hidden overflow-hidden"
+              className="lg:hidden overflow-hidden bg-gray-900/95 backdrop-blur-lg rounded-xl mt-4 border border-gray-800"
             >
-              <div className="pt-4 pb-2 border-t border-gray-800 mt-4">
+              <div className="pt-4 pb-2">
+                {/* Mobile Welcome Message */}
+                <div className="px-4 mb-4">
+                  <p className="text-lg font-bold text-white">{getWelcomeMessage()}</p>
+                  <p className="text-sm text-gray-400">What would you like to do today?</p>
+                </div>
+                
                 {/* Mobile Language Switch */}
-                <div className="mb-4 px-2">
+                <div className="mb-4 px-4">
                   <LanguageSwitch language={language} setLanguage={setLanguage} />
                 </div>
                 
-                <div className="grid grid-cols-2 gap-2">
+                {/* All Navigation Items in Mobile */}
+                <div className="grid grid-cols-3 gap-3 px-4">
                   {navItems.map((item) => (
                     <Link
                       key={item.path}
                       to={item.path}
                       onClick={() => setIsMenuOpen(false)}
-                      className={`flex items-center space-x-2 px-4 py-3 rounded-lg transition-all ${
-                        window.location.pathname === item.path
-                          ? 'bg-gray-800 text-white'
+                      className={`
+                        flex flex-col items-center p-4 rounded-xl transition-all
+                        ${isActive(item.path)
+                          ? 'bg-gradient-to-br from-blue-900/30 to-purple-900/30 text-white border border-blue-500/30'
                           : 'text-gray-400 hover:text-white hover:bg-gray-800/50'
-                      }`}
+                        }
+                      `}
                     >
-                      <span className={item.color}>{item.icon}</span>
-                      <span>{item.label}</span>
+                      <span className={`text-2xl mb-2 ${item.color}`}>{item.icon}</span>
+                      <span className="text-sm font-medium text-center mb-1">{item.label}</span>
+                      <span className="text-xs text-gray-400 text-center">{item.description}</span>
                     </Link>
                   ))}
                 </div>
                 
-                <div className="mt-4 pt-4 border-t border-gray-800">
+                <div className="mt-6 pt-6 border-t border-gray-800 px-4">
                   {/* Mobile Profile Info */}
-                  <div className="flex items-center space-x-3 mb-4 px-2">
-                    <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-njia-orange">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-orange-500">
                       <img 
                         src={profileImage} 
                         alt="Profile" 
@@ -344,14 +387,14 @@ const Header = ({ language, setLanguage, subscription }) => {
                       />
                     </div>
                     <div>
-                      <p className="font-medium">{userName}</p>
+                      <p className="font-medium text-white">{userName}</p>
                       <p className="text-xs text-gray-400 capitalize">{getSubscriptionText()} Member</p>
                     </div>
                   </div>
                   
                   <button
                     onClick={handleLogout}
-                    className="flex items-center justify-center space-x-2 w-full px-4 py-3 bg-gradient-to-r from-njia-darkblue to-njia-purple rounded-lg hover:opacity-90 transition-opacity"
+                    className="flex items-center justify-center space-x-2 w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg hover:opacity-90 transition-opacity font-medium"
                   >
                     <FiLogOut /><span>Logout</span>
                   </button>
