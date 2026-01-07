@@ -8,11 +8,12 @@ const Header = ({ language, setLanguage, subscription }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [unreadNotifications, setUnreadNotifications] = useState(3);
-  const [userName, setUserName] = useState('Brian Nyarienya');
+  const [userName, setUserName] = useState('User');
+  const [userSubscription, setUserSubscription] = useState('free');
   const [profileImage, setProfileImage] = useState('https://api.dicebear.com/7.x/avataaars/svg?seed=brian');
   const navigate = useNavigate();
 
-  const logoUrl = "https://media.licdn.com/dms/image/v2/D4D22AQG0Atyt2w2ZFQ/feedshare-shrink_800/B4DZsegFI0K8Ag-/0/1765743287150?e=1769644800&v=beta&t=V7uxIxe8F4wdKGtZV1dK5Es4vQeMVFohcxtotEeb-Yw";
+  const logoUrl = "/logos/logo.svg";
 
   // Load user data from localStorage to match UserProfile.jsx
   useEffect(() => {
@@ -22,6 +23,7 @@ const Header = ({ language, setLanguage, subscription }) => {
       try {
         const parsedData = JSON.parse(userData);
         if (parsedData.name) setUserName(parsedData.name);
+        if (parsedData.subscription) setUserSubscription(parsedData.subscription);
       } catch (error) {
         console.error('Error parsing user data:', error);
       }
@@ -32,7 +34,13 @@ const Header = ({ language, setLanguage, subscription }) => {
     if (savedImage) {
       setProfileImage(savedImage);
     }
-  }, []);
+
+    // Load subscription from localStorage
+    const userSub = localStorage.getItem('njiasafe_subscription');
+    if (userSub) {
+      setUserSubscription(userSub);
+    }
+  }, [subscription]);
 
   const navItems = [
     { path: '/', icon: <FiHome />, label: 'Dashboard', color: 'text-blue-400' },
@@ -60,9 +68,13 @@ const Header = ({ language, setLanguage, subscription }) => {
     navigate('/notifications');
   };
 
-  // Function to update profile image when changed in UserProfile
-  const updateProfileImage = (newImage) => {
-    setProfileImage(newImage);
+  // Get subscription display text
+  const getSubscriptionText = () => {
+    switch(userSubscription) {
+      case 'premium': return 'Premium';
+      case 'enterprise': return 'Enterprise';
+      default: return 'Free';
+    }
   };
 
   return (
@@ -185,7 +197,7 @@ const Header = ({ language, setLanguage, subscription }) => {
                 </div>
                 <div className="hidden md:block text-left">
                   <p className="text-sm font-medium">{userName}</p>
-                  <p className="text-xs text-gray-400 capitalize">Premium Member</p>
+                  <p className="text-xs text-gray-400 capitalize">{getSubscriptionText()} Member</p>
                 </div>
               </button>
 
@@ -213,7 +225,7 @@ const Header = ({ language, setLanguage, subscription }) => {
                         </div>
                         <div>
                           <p className="font-bold">{userName}</p>
-                          <p className="text-sm text-gray-400">Premium Member</p>
+                          <p className="text-sm text-gray-400 capitalize">{getSubscriptionText()} Member</p>
                         </div>
                       </div>
                     </div>
@@ -333,7 +345,7 @@ const Header = ({ language, setLanguage, subscription }) => {
                     </div>
                     <div>
                       <p className="font-medium">{userName}</p>
-                      <p className="text-xs text-gray-400">Premium Member</p>
+                      <p className="text-xs text-gray-400 capitalize">{getSubscriptionText()} Member</p>
                     </div>
                   </div>
                   
