@@ -8,10 +8,31 @@ const Header = ({ language, setLanguage, subscription }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [unreadNotifications, setUnreadNotifications] = useState(3);
+  const [userName, setUserName] = useState('Brian Nyarienya');
+  const [profileImage, setProfileImage] = useState('https://api.dicebear.com/7.x/avataaars/svg?seed=brian');
   const navigate = useNavigate();
 
   const logoUrl = "https://media.licdn.com/dms/image/v2/D4D22AQG0Atyt2w2ZFQ/feedshare-shrink_800/B4DZsegFI0K8Ag-/0/1765743287150?e=1769644800&v=beta&t=V7uxIxe8F4wdKGtZV1dK5Es4vQeMVFohcxtotEeb-Yw";
-  const profileImage = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80";
+
+  // Load user data from localStorage to match UserProfile.jsx
+  useEffect(() => {
+    // Load saved user data
+    const userData = localStorage.getItem('njiasafe_user');
+    if (userData) {
+      try {
+        const parsedData = JSON.parse(userData);
+        if (parsedData.name) setUserName(parsedData.name);
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+      }
+    }
+
+    // Load saved profile image from localStorage (same as UserProfile.jsx)
+    const savedImage = localStorage.getItem('njiasafe_profile_image');
+    if (savedImage) {
+      setProfileImage(savedImage);
+    }
+  }, []);
 
   const navItems = [
     { path: '/', icon: <FiHome />, label: 'Dashboard', color: 'text-blue-400' },
@@ -37,6 +58,11 @@ const Header = ({ language, setLanguage, subscription }) => {
   const handleNotificationClick = () => {
     setUnreadNotifications(0);
     navigate('/notifications');
+  };
+
+  // Function to update profile image when changed in UserProfile
+  const updateProfileImage = (newImage) => {
+    setProfileImage(newImage);
   };
 
   return (
@@ -145,12 +171,21 @@ const Header = ({ language, setLanguage, subscription }) => {
                 onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
                 className="flex items-center space-x-3 p-2 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors"
               >
+                {/* Profile image - same as UserProfile.jsx */}
                 <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-njia-orange">
-                  <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+                  <img 
+                    src={profileImage} 
+                    alt="Profile" 
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'https://api.dicebear.com/7.x/avataaars/svg?seed=brian';
+                    }}
+                  />
                 </div>
                 <div className="hidden md:block text-left">
-                  <p className="text-sm font-medium">Premium User</p>
-                  <p className="text-xs text-gray-400 capitalize">{subscription}</p>
+                  <p className="text-sm font-medium">{userName}</p>
+                  <p className="text-xs text-gray-400 capitalize">Premium Member</p>
                 </div>
               </button>
 
@@ -164,11 +199,20 @@ const Header = ({ language, setLanguage, subscription }) => {
                   >
                     <div className="p-4 border-b border-gray-800">
                       <div className="flex items-center space-x-3">
+                        {/* Larger profile image - same as UserProfile.jsx */}
                         <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-njia-orange">
-                          <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+                          <img 
+                            src={profileImage} 
+                            alt="Profile" 
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = 'https://api.dicebear.com/7.x/avataaars/svg?seed=brian';
+                            }}
+                          />
                         </div>
                         <div>
-                          <p className="font-bold">John Doe</p>
+                          <p className="font-bold">{userName}</p>
                           <p className="text-sm text-gray-400">Premium Member</p>
                         </div>
                       </div>
@@ -177,6 +221,7 @@ const Header = ({ language, setLanguage, subscription }) => {
                     <div className="p-2">
                       <Link
                         to="/profile"
+                        onClick={() => setIsProfileMenuOpen(false)}
                         className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors"
                       >
                         <FiUser className="text-gray-400" />
@@ -184,6 +229,7 @@ const Header = ({ language, setLanguage, subscription }) => {
                       </Link>
                       <Link
                         to="/settings"
+                        onClick={() => setIsProfileMenuOpen(false)}
                         className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors"
                       >
                         <FiSettings className="text-gray-400" />
@@ -191,6 +237,7 @@ const Header = ({ language, setLanguage, subscription }) => {
                       </Link>
                       <Link
                         to="/subscription"
+                        onClick={() => setIsProfileMenuOpen(false)}
                         className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors"
                       >
                         <FiCreditCard className="text-gray-400" />
@@ -198,6 +245,7 @@ const Header = ({ language, setLanguage, subscription }) => {
                       </Link>
                       <Link
                         to="/payment"
+                        onClick={() => setIsProfileMenuOpen(false)}
                         className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors"
                       >
                         <FiDollarSign className="text-gray-400" />
@@ -205,6 +253,7 @@ const Header = ({ language, setLanguage, subscription }) => {
                       </Link>
                       <Link
                         to="/government-insurance"
+                        onClick={() => setIsProfileMenuOpen(false)}
                         className="flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors"
                       >
                         <FiShield className="text-gray-400" />
@@ -269,6 +318,25 @@ const Header = ({ language, setLanguage, subscription }) => {
                 </div>
                 
                 <div className="mt-4 pt-4 border-t border-gray-800">
+                  {/* Mobile Profile Info */}
+                  <div className="flex items-center space-x-3 mb-4 px-2">
+                    <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-njia-orange">
+                      <img 
+                        src={profileImage} 
+                        alt="Profile" 
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = 'https://api.dicebear.com/7.x/avataaars/svg?seed=brian';
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <p className="font-medium">{userName}</p>
+                      <p className="text-xs text-gray-400">Premium Member</p>
+                    </div>
+                  </div>
+                  
                   <button
                     onClick={handleLogout}
                     className="flex items-center justify-center space-x-2 w-full px-4 py-3 bg-gradient-to-r from-njia-darkblue to-njia-purple rounded-lg hover:opacity-90 transition-opacity"

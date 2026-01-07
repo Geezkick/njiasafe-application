@@ -3,10 +3,11 @@ import { motion } from 'framer-motion';
 import { FiNavigation, FiMap, FiUsers, FiBatteryCharging, FiTrendingUp, FiShield, FiClock, FiAlertCircle, FiCreditCard, FiDollarSign, FiCheckCircle, FiZap, FiBell, FiCalendar, FiBarChart, FiArrowRight, FiGlobe } from 'react-icons/fi';
 import TravelModeSelector from '../components/TravelModeSelector';
 import AnimatedButton from '../components/AnimatedButton';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
   const [travelMode, setTravelMode] = useState('drive');
+  const navigate = useNavigate();
   const logoUrl = "https://media.licdn.com/dms/image/v2/D4D22AQG0Atyt2w2ZFQ/feedshare-shrink_800/B4DZsegFI0K8Ag-/0/1765743287150?e=1769644800&v=beta&t=V7uxIxe8F4wdKGtZV1dK5Es4vQeMVFohcxtotEeb-Yw";
   
   const stats = [
@@ -36,14 +37,43 @@ const Dashboard = () => {
     { benefit: 'Theft Protection', status: 'Active', value: 'KES 300,000' }
   ];
 
+  // Button handlers
+  const handleStartNavigation = () => {
+    navigate('/smart-map');
+  };
+
+  const handleViewMap = () => {
+    navigate('/smart-map');
+  };
+
+  const handleMakeNewPayment = () => {
+    navigate('/payment');
+  };
+
+  const handleManagePlan = () => {
+    navigate('/subscription');
+  };
+
+  const handleUpgrade = () => {
+    navigate('/payment');
+  };
+
+  const handleUpdatePayment = () => {
+    navigate('/payment');
+  };
+
+  const handleCheckInsurance = () => {
+    navigate('/government-insurance');
+  };
+
   return (
-    <div className="animate-fade-in">
-      {/* Header with Logo */}
-      <div className="mb-8">
+    <div className="animate-fade-in min-h-screen pb-8">
+      {/* Header with Logo - Fixed with proper spacing */}
+      <div className="mb-8 pt-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between">
           <div className="flex items-center space-x-4 mb-4 md:mb-0">
             {/* Circular Logo */}
-            <div className="relative w-16 h-16">
+            <div className="relative w-20 h-20">
               {/* Animated ring */}
               <motion.div
                 animate={{ rotate: 360 }}
@@ -84,22 +114,22 @@ const Dashboard = () => {
             
             {/* Welcome Text */}
             <div>
-              <h1 className="text-3xl font-bold">
+              <h1 className="text-3xl md:text-4xl font-bold">
                 Welcome back, <span className="text-njia-orange">Premium User</span>
               </h1>
               <p className="text-gray-400 mt-2">Your safety dashboard is optimized for today's journey</p>
-              {/* New Slogan */}
-              <div className="flex items-center space-x-2 mt-1">
-                <FiGlobe className="text-njia-orange w-4 h-4" />
-                <p className="text-njia-darkblue font-semibold text-sm">
+              {/* New Slogan - Full width on mobile */}
+              <div className="flex items-center space-x-2 mt-3">
+                <FiGlobe className="text-njia-orange w-5 h-5 flex-shrink-0" />
+                <p className="text-njia-darkblue font-semibold text-base md:text-lg">
                   Smart Navigation Built for Africa
                 </p>
               </div>
             </div>
           </div>
           
-          {/* Stats Summary */}
-          <div className="flex items-center space-x-4">
+          {/* Stats Summary - Hide on small screens */}
+          <div className="hidden lg:flex items-center space-x-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-njia-darkblue">NJIA</div>
               <div className="text-xs text-gray-400">Navigation</div>
@@ -121,7 +151,7 @@ const Dashboard = () => {
               initial={{ opacity: 0, y: 20 }} 
               animate={{ opacity: 1, y: 0 }} 
               transition={{ delay: index * 0.1 }} 
-              className="bg-premium-card rounded-xl p-6 border border-gray-800 hover:border-njia-orange/50 transition-colors cursor-pointer"
+              className="bg-premium-card rounded-xl p-6 border border-gray-800 hover:border-njia-orange/50 transition-colors cursor-pointer h-full"
             >
               <div className="flex items-center justify-between">
                 <div className={`p-3 rounded-lg bg-gray-900 ${stat.color}`}>{stat.icon}</div>
@@ -143,13 +173,13 @@ const Dashboard = () => {
               <h3 className="text-lg font-semibold text-gray-300">Plan Your Journey</h3>
               <span className="text-xs px-2 py-1 bg-green-500/20 text-green-500 rounded">Live Traffic</span>
             </div>
-            <TravelModeSelector selectedMode={travelMode} onModeChange={setTravelMode} />
+            <TravelModeSelector mode={travelMode} setMode={setTravelMode} />
             <div className="mt-6 grid grid-cols-2 gap-4">
-              <AnimatedButton fullWidth>
+              <AnimatedButton onClick={handleStartNavigation} fullWidth>
                 <FiNavigation className="mr-2" />
                 Start Navigation
               </AnimatedButton>
-              <AnimatedButton variant="outline" fullWidth>
+              <AnimatedButton onClick={handleViewMap} variant="outline" fullWidth>
                 <FiMap className="mr-2" />
                 View Map
               </AnimatedButton>
@@ -234,13 +264,11 @@ const Dashboard = () => {
               ))}
             </div>
 
-            <Link to="/payment">
-              <AnimatedButton fullWidth>
-                <FiDollarSign className="mr-2" />
-                Make New Payment
-                <FiArrowRight className="ml-2" />
-              </AnimatedButton>
-            </Link>
+            <AnimatedButton onClick={handleMakeNewPayment} fullWidth>
+              <FiDollarSign className="mr-2" />
+              Make New Payment
+              <FiArrowRight className="ml-2" />
+            </AnimatedButton>
           </div>
 
           {/* Insurance Benefits */}
@@ -262,12 +290,10 @@ const Dashboard = () => {
               ))}
             </div>
 
-            <Link to="/government-insurance">
-              <AnimatedButton variant="secondary" fullWidth>
-                <FiShield className="mr-2" />
-                View Insurance Details
-              </AnimatedButton>
-            </Link>
+            <AnimatedButton onClick={handleCheckInsurance} variant="secondary" fullWidth>
+              <FiShield className="mr-2" />
+              View Insurance Details
+            </AnimatedButton>
           </div>
 
           {/* Subscription Status */}
@@ -296,16 +322,12 @@ const Dashboard = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <Link to="/subscription">
-                <button className="w-full py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors text-sm">
-                  Manage Plan
-                </button>
-              </Link>
-              <Link to="/payment">
-                <button className="w-full py-2 bg-njia-orange hover:bg-orange-600 rounded-lg transition-colors text-sm">
-                  Upgrade
-                </button>
-              </Link>
+              <button onClick={handleManagePlan} className="w-full py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors text-sm">
+                Manage Plan
+              </button>
+              <button onClick={handleUpgrade} className="w-full py-2 bg-njia-orange hover:bg-orange-600 rounded-lg transition-colors text-sm">
+                Upgrade
+              </button>
             </div>
           </div>
 
@@ -389,18 +411,14 @@ const Dashboard = () => {
             </div>
           </div>
           <div className="flex space-x-3">
-            <Link to="/payment">
-              <AnimatedButton variant="secondary">
-                <FiDollarSign className="mr-2" />
-                Update Payment
-              </AnimatedButton>
-            </Link>
-            <Link to="/government-insurance">
-              <AnimatedButton>
-                <FiShield className="mr-2" />
-                Check Insurance
-              </AnimatedButton>
-            </Link>
+            <AnimatedButton onClick={handleUpdatePayment} variant="secondary">
+              <FiDollarSign className="mr-2" />
+              Update Payment
+            </AnimatedButton>
+            <AnimatedButton onClick={handleCheckInsurance}>
+              <FiShield className="mr-2" />
+              Check Insurance
+            </AnimatedButton>
           </div>
         </div>
       </motion.div>
