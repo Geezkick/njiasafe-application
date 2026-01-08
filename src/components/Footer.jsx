@@ -1,61 +1,105 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FiNavigation, FiShield, FiClock, FiHelpCircle } from 'react-icons/fi';
+import { FiHome, FiMap, FiBatteryCharging, FiUsers, FiMessageSquare, FiShield, FiSettings, FiHelpCircle, FiZap, FiNavigation } from 'react-icons/fi';
 
 const Footer = () => {
+  const currentYear = new Date().getFullYear();
+
+  const footerLinks = [
+    { name: 'Dashboard', icon: <FiHome />, path: '/' },
+    { name: 'Smart Map', icon: <FiMap />, path: '/smart-map' },
+    { name: 'EV Charging', icon: <FiBatteryCharging />, path: '/ev-charging' },
+    { name: 'Community', icon: <FiUsers />, path: '/community' },
+    { name: 'Social', icon: <FiMessageSquare />, path: '/social' },
+    { name: 'Insurance', icon: <FiShield />, path: '/government-insurance' },
+    { name: 'V2V', icon: <FiZap />, path: '/v2v' },
+    { name: 'Settings', icon: <FiSettings />, path: '/settings' },
+  ];
+
   return (
-    <footer className="bg-premium-card border-t border-gray-800 mt-16">
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-njia-darkblue to-njia-purple rounded-lg flex items-center justify-center"><span className="font-bold text-white">N</span></div>
-              <h2 className="text-xl font-bold"><span className="text-njia-darkblue">NJIA</span><span className="text-njia-orange">SAFE</span></h2>
+    <footer className="bg-gray-900/95 backdrop-blur-lg border-t border-gray-800 mt-8">
+      <div className="container mx-auto px-4 py-6">
+        {/* Quick Links */}
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 mb-6">
+          {footerLinks.map((link, index) => (
+            <Link
+              key={index}
+              to={link.path}
+              className="flex flex-col items-center p-3 rounded-lg hover:bg-gray-800/50 transition-colors group"
+            >
+              <div className="text-gray-400 group-hover:text-blue-400 transition-colors mb-1">
+                {link.icon}
+              </div>
+              <span className="text-xs text-gray-400 group-hover:text-white transition-colors">
+                {link.name}
+              </span>
+            </Link>
+          ))}
+        </div>
+
+        {/* Divider */}
+        <div className="border-t border-gray-800 mb-6"></div>
+
+        {/* Copyright and Info */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between">
+          <div className="mb-4 md:mb-0">
+            <div className="flex items-center space-x-2 mb-2">
+              <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-gray-700">
+                <img 
+                  src="https://media.licdn.com/dms/image/v2/D4D22AQG0Atyt2w2ZFQ/feedshare-shrink_800/B4DZsegFI0K8Ag-/0/1765743287150?e=1769644800&v=beta&t=V7uxIxe8F4wdKGtZV1dK5Es4vQeMVFohcxtotEeb-Yw" 
+                  alt="NJIA SAFE Logo"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold">
+                  <span className="text-blue-400">NJIA</span>{' '}
+                  <span className="text-orange-400">SAFE</span>
+                </h3>
+                <p className="text-xs text-gray-400">
+                  Smart Navigation Built for Africa
+                </p>
+              </div>
             </div>
-            <p className="text-gray-400 text-sm">Premium safe routes and community protection platform. Making every journey secure and efficient.</p>
-            <p className="text-gray-500 text-xs mt-4">Developed by Brian Nyarienya</p>
+            <p className="text-sm text-gray-400">
+              Your trusted partner for safe and smart journeys across East Africa
+            </p>
+            <p className="text-xs text-gray-500 mt-1">
+              Developed by Brian Nyarienya
+            </p>
           </div>
 
-          <div>
-            <h3 className="text-lg font-semibold mb-4 text-njia-orange">Quick Links</h3>
-            <ul className="space-y-2">
-              <li><Link to="/routes" className="text-gray-400 hover:text-njia-orange transition-colors">Safe Routes</Link></li>
-              <li><Link to="/ev-charging" className="text-gray-400 hover:text-njia-orange transition-colors">EV Charging</Link></li>
-              <li><Link to="/community" className="text-gray-400 hover:text-njia-orange transition-colors">Community</Link></li>
-              <li><Link to="/v2v" className="text-gray-400 hover:text-njia-orange transition-colors">V2V Network</Link></li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold mb-4 text-njia-orange">Features</h3>
-            <ul className="space-y-2">
-              <li className="flex items-center space-x-2 text-gray-400"><FiNavigation className="text-njia-purple" /><span>Real-time Navigation</span></li>
-              <li className="flex items-center space-x-2 text-gray-400"><FiShield className="text-njia-purple" /><span>Safety Alerts</span></li>
-              <li className="flex items-center space-x-2 text-gray-400"><FiClock className="text-njia-purple" /><span>ETAs & Live Updates</span></li>
-              <li className="flex items-center space-x-2 text-gray-400"><FiHelpCircle className="text-njia-purple" /><span>24/7 Support</span></li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold mb-4 text-njia-orange">Stay Updated</h3>
-            <p className="text-gray-400 text-sm mb-4">Subscribe to receive safety alerts and updates</p>
-            <div className="flex">
-              <input type="email" placeholder="Your email" className="flex-1 px-4 py-2 bg-gray-900 border border-gray-800 rounded-l-lg focus:outline-none focus:border-njia-orange" />
-              <button className="px-4 py-2 bg-gradient-to-r from-njia-darkblue to-njia-purple rounded-r-lg hover:opacity-90 transition-opacity">Subscribe</button>
-            </div>
-            <div className="mt-6 flex space-x-4">
-              <button className="text-gray-400 hover:text-njia-orange transition-colors">Terms</button>
-              <button className="text-gray-400 hover:text-njia-orange transition-colors">Privacy</button>
-              <button className="text-gray-400 hover:text-njia-orange transition-colors">Contact</button>
+          <div className="text-sm text-gray-400">
+            <p>© {currentYear} NJIA SAFE. All rights reserved.</p>
+            <div className="flex space-x-4 mt-2">
+              <Link to="/privacy" className="hover:text-blue-400 transition-colors">
+                Privacy Policy
+              </Link>
+              <Link to="/terms" className="hover:text-blue-400 transition-colors">
+                Terms of Service
+              </Link>
+              <Link to="/contact" className="hover:text-blue-400 transition-colors">
+                Contact Us
+              </Link>
             </div>
           </div>
         </div>
 
-        <div className="border-t border-gray-800 mt-8 pt-8 text-center">
-          <p className="text-gray-500 text-sm">© {new Date().getFullYear()} NJIASAFE Premium. All rights reserved. <span className="text-njia-orange ml-2">Making Travel Safe Again</span></p>
+        {/* Status Bar */}
+        <div className="mt-6 p-3 bg-gray-800/50 rounded-lg border border-gray-700">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+              <span className="text-sm text-gray-300">System Status: All Systems Operational</span>
+            </div>
+            <div className="text-xs text-gray-500">
+              Smart Navigation Built for Africa • Developed by Brian Nyarienya
+            </div>
+          </div>
         </div>
       </div>
     </footer>
   );
 };
+
 export default Footer;

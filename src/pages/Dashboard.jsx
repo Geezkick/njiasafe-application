@@ -1,424 +1,533 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FiNavigation, FiMap, FiUsers, FiBatteryCharging, FiTrendingUp, FiShield, FiClock, FiAlertCircle, FiCreditCard, FiDollarSign, FiCheckCircle, FiZap, FiBell, FiCalendar, FiBarChart, FiArrowRight, FiGlobe } from 'react-icons/fi';
-import TravelModeSelector from '../components/TravelModeSelector';
-import AnimatedButton from '../components/AnimatedButton';
-import { Link, useNavigate } from 'react-router-dom';
+import { 
+  FiMap, FiBatteryCharging, FiUsers, FiMessageSquare, FiNavigation, 
+  FiShield, FiTrendingUp, FiAlertCircle, FiCalendar, FiStar, 
+  FiBarChart2, FiGlobe, FiTruck, FiDollarSign, FiUser, FiHome,
+  FiActivity, FiCreditCard, FiSettings, FiClock, FiCheckCircle,
+  FiEdit2, FiZap
+} from 'react-icons/fi';
+import { Link } from 'react-router-dom';
+import { getUserProfilePic } from '../utils/setupDefaultUser';
 
 const Dashboard = () => {
-  const [travelMode, setTravelMode] = useState('drive');
-  const navigate = useNavigate();
-  const logoUrl = "https://media.licdn.com/dms/image/v2/D4D22AQG0Atyt2w2ZFQ/feedshare-shrink_800/B4DZsegFI0K8Ag-/0/1765743287150?e=1769644800&v=beta&t=V7uxIxe8F4wdKGtZV1dK5Es4vQeMVFohcxtotEeb-Yw";
-  
-  const stats = [
-    { icon: <FiNavigation />, label: 'Active Routes', value: '24', change: '+12%', color: 'text-blue-500', link: '/routes' },
-    { icon: <FiShield />, label: 'Safety Score', value: '9.8/10', change: '+0.2', color: 'text-green-500', link: '/government-insurance' },
-    { icon: <FiUsers />, label: 'Community Online', value: '1.2k', change: '+5%', color: 'text-purple-500', link: '/community' },
-    { icon: <FiBatteryCharging />, label: 'EV Stations', value: '48', change: '+3', color: 'text-orange-500', link: '/ev-charging' }
-  ];
+  const [userName, setUserName] = useState('User');
+  const [userProfilePic, setUserProfilePic] = useState('');
+  const [userData, setUserData] = useState(null);
+  const [recentActivity, setRecentActivity] = useState([]);
+  const [stats, setStats] = useState({
+    trips: 24,
+    distance: '1,240 km',
+    carbonSaved: '45 kg',
+    chargingSessions: 12
+  });
 
+  // Load user data
+  useEffect(() => {
+    const userData = localStorage.getItem('njiasafe_user');
+    if (userData) {
+      try {
+        const parsedData = JSON.parse(userData);
+        setUserData(parsedData);
+        if (parsedData.name) setUserName(parsedData.name);
+        if (parsedData.stats) setStats(parsedData.stats);
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+      }
+    }
+
+    // Get profile picture
+    const profilePic = getUserProfilePic();
+    setUserProfilePic(profilePic);
+
+    // Load recent activity
+    const activity = [
+      { id: 1, type: 'trip', title: 'Nairobi to Mombasa', time: '2 hours ago', icon: <FiTruck />, color: 'text-blue-500', bgColor: 'bg-blue-500/10' },
+      { id: 2, type: 'charging', title: 'EV Charging Session', time: '5 hours ago', icon: <FiBatteryCharging />, color: 'text-green-500', bgColor: 'bg-green-500/10' },
+      { id: 3, type: 'community', title: 'New Community Post', time: '1 day ago', icon: <FiUsers />, color: 'text-purple-500', bgColor: 'bg-purple-500/10' },
+      { id: 4, type: 'alert', title: 'Route Alert Resolved', time: '2 days ago', icon: <FiAlertCircle />, color: 'text-orange-500', bgColor: 'bg-orange-500/10' }
+    ];
+    setRecentActivity(activity);
+  }, []);
+
+  // Get user's first name
+  const getFirstName = () => {
+    return userName.split(' ')[0];
+  };
+
+  // Get initials for avatar
+  const getInitials = () => {
+    return userName
+      .split(' ')
+      .map(word => word[0])
+      .join('')
+      .toUpperCase()
+      .substring(0, 2);
+  };
+
+  const getPlanType = () => {
+    if (!userData || !userData.plan) return 'PREMIUM';
+    return userData.plan.toUpperCase();
+  };
+
+  const getAccountStatus = () => {
+    if (!userData || !userData.plan) return 'ACTIVE';
+    return userData.status || 'ACTIVE';
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+      });
+    } catch (error) {
+      return 'N/A';
+    }
+  };
+
+  const getDaysRemaining = () => {
+    if (!userData || !userData.expiresAt) return 365;
+    try {
+      const expires = new Date(userData.expiresAt);
+      const today = new Date();
+      const diffTime = expires - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays > 0 ? diffDays : 0;
+    } catch (error) {
+      return 365;
+    }
+  };
+
+  // Quick action cards with icons
   const quickActions = [
-    { icon: <FiDollarSign />, label: 'Make Payment', description: 'Pay subscription', color: 'from-green-500 to-emerald-600', link: '/payment' },
-    { icon: <FiCreditCard />, label: 'Subscription', description: 'Manage plan', color: 'from-blue-500 to-cyan-600', link: '/subscription' },
-    { icon: <FiShield />, label: 'Insurance', description: 'View benefits', color: 'from-red-500 to-red-600', link: '/government-insurance' },
-    { icon: <FiBell />, label: 'Alerts', description: '3 new alerts', color: 'from-yellow-500 to-orange-600', link: '/notifications' }
+    { 
+      title: 'Smart Map', 
+      description: 'Interactive maps & real-time traffic', 
+      icon: <FiMap className="text-3xl" />, 
+      color: 'from-blue-500 to-cyan-500',
+      path: '/smart-map'
+    },
+    { 
+      title: 'V2V Connect', 
+      description: 'Vehicle-to-vehicle network', 
+      icon: <FiNavigation className="text-3xl" />, 
+      color: 'from-purple-500 to-pink-500',
+      path: '/v2v'
+    },
+    { 
+      title: 'EV Charging', 
+      description: 'Charging stations locator', 
+      icon: <FiBatteryCharging className="text-3xl" />, 
+      color: 'from-green-500 to-emerald-500',
+      path: '/ev-charging'
+    },
+    { 
+      title: 'Community', 
+      description: 'User community & alerts', 
+      icon: <FiUsers className="text-3xl" />, 
+      color: 'from-orange-500 to-red-500',
+      path: '/community'
+    },
+    { 
+      title: 'Social Platform', 
+      description: 'Social platform for users', 
+      icon: <FiMessageSquare className="text-3xl" />, 
+      color: 'from-indigo-500 to-blue-500',
+      path: '/social'
+    },
+    { 
+      title: 'Insurance', 
+      description: 'Government coverage', 
+      icon: <FiShield className="text-3xl" />, 
+      color: 'from-red-500 to-orange-500',
+      path: '/government-insurance'
+    }
   ];
 
-  const recentPayments = [
-    { id: 1, service: 'Premium Plan', amount: 'Ksh 899', date: 'Today', status: 'paid', method: 'M-Pesa' },
-    { id: 2, service: 'Insurance', amount: 'Ksh 1,500', date: '2 days ago', status: 'paid', method: 'Card' },
-    { id: 3, service: 'EV Charging', amount: 'Ksh 350', date: '1 week ago', status: 'pending', method: 'M-Pesa' }
+  // Stats cards with icons
+  const statCards = [
+    { label: 'Total Trips', value: stats.trips, icon: <FiTruck className="text-2xl" />, color: 'text-blue-500', bgColor: 'bg-blue-500/10', change: '+12%' },
+    { label: 'Distance Covered', value: stats.distance, icon: <FiGlobe className="text-2xl" />, color: 'text-green-500', bgColor: 'bg-green-500/10', change: '+8%' },
+    { label: 'Carbon Saved', value: stats.carbonSaved, icon: <FiTrendingUp className="text-2xl" />, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', change: '+15%' },
+    { label: 'Charging Sessions', value: stats.chargingSessions, icon: <FiBatteryCharging className="text-2xl" />, color: 'text-orange-500', bgColor: 'bg-orange-500/10', change: '+5%' }
   ];
 
-  const insuranceBenefits = [
-    { benefit: 'Accident Coverage', status: 'Active', value: 'KES 500,000' },
-    { benefit: 'Roadside Assistance', status: 'Active', value: '24/7' },
-    { benefit: 'Medical Cover', status: 'Active', value: 'KES 200,000' },
-    { benefit: 'Theft Protection', status: 'Active', value: 'KES 300,000' }
+  // Premium features with icons
+  const premiumFeatures = [
+    { 
+      title: 'Enhanced Insurance', 
+      description: 'Government-backed coverage', 
+      icon: <FiShield className="text-xl text-green-400" />,
+      buttonText: 'View',
+      path: '/government-insurance',
+      buttonColor: 'bg-blue-600 hover:bg-blue-700'
+    },
+    { 
+      title: 'Easy Payments', 
+      description: 'Manage subscriptions & bills', 
+      icon: <FiDollarSign className="text-xl text-green-400" />,
+      buttonText: 'Pay Now',
+      path: '/payment',
+      buttonColor: 'bg-green-600 hover:bg-green-700'
+    },
+    { 
+      title: 'Advanced Analytics', 
+      description: 'Detailed journey insights', 
+      icon: <FiBarChart2 className="text-xl text-purple-400" />,
+      buttonText: 'Explore',
+      path: '/settings',
+      buttonColor: 'bg-purple-600 hover:bg-purple-700'
+    }
   ];
 
-  // Button handlers
-  const handleStartNavigation = () => {
-    navigate('/smart-map');
-  };
-
-  const handleViewMap = () => {
-    navigate('/smart-map');
-  };
-
-  const handleMakeNewPayment = () => {
-    navigate('/payment');
-  };
-
-  const handleManagePlan = () => {
-    navigate('/subscription');
-  };
-
-  const handleUpgrade = () => {
-    navigate('/payment');
-  };
-
-  const handleUpdatePayment = () => {
-    navigate('/payment');
-  };
-
-  const handleCheckInsurance = () => {
-    navigate('/government-insurance');
-  };
+  const daysRemaining = getDaysRemaining();
 
   return (
-    <div className="animate-fade-in min-h-screen pb-8">
-      {/* Header with Logo - Fixed with proper spacing */}
-      <div className="mb-8 pt-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between">
-          <div className="flex items-center space-x-4 mb-4 md:mb-0">
-            {/* Circular Logo */}
-            <div className="relative w-20 h-20">
-              {/* Animated ring */}
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                className="absolute inset-0 border-2 border-transparent rounded-full"
-                style={{
-                  background: 'conic-gradient(from 0deg, #1e3a8a, #8b5cf6, #f59e0b, #1e3a8a)',
-                  WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-                  WebkitMaskComposite: 'xor',
-                  maskComposite: 'exclude',
-                  padding: '2px',
-                }}
-              />
-              
-              {/* Logo Image */}
-              <div className="absolute inset-2 rounded-full overflow-hidden bg-gray-900 flex items-center justify-center p-1">
-                <img 
-                  src={logoUrl}
-                  alt="NJIA SAFE Logo" 
-                  className="w-full h-full object-contain"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.style.display = 'none';
-                    // Fallback to text
-                    const fallback = document.createElement('div');
-                    fallback.className = 'flex flex-col items-center justify-center h-full w-full';
-                    fallback.innerHTML = `
-                      <div class="text-lg font-bold">
-                        <span class="text-njia-darkblue">NJIA</span>
-                        <span class="text-njia-orange"> SAFE</span>
-                      </div>
-                    `;
-                    e.target.parentNode.appendChild(fallback);
-                  }}
-                />
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-gray-950 text-white pt-4 px-4 md:px-6 pb-8">
+      {/* Welcome Section */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="mb-8"
+      >
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
+          <div>
+            <div className="flex items-center mb-4">
+              <div className="relative">
+                {userProfilePic ? (
+                  <img 
+                    src={userProfilePic} 
+                    alt={userName}
+                    className="w-20 h-20 rounded-full border-4 border-gray-800 mr-4 object-cover"
+                  />
+                ) : (
+                  <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-orange-500 rounded-full flex items-center justify-center border-4 border-gray-800 mr-4">
+                    <span className="text-white font-bold text-2xl">{getInitials()}</span>
+                  </div>
+                )}
+                <Link 
+                  to="/profile"
+                  className="absolute bottom-0 right-4 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center border-2 border-gray-800 hover:bg-blue-700 transition-colors"
+                >
+                  <FiEdit2 className="text-white text-sm" />
+                </Link>
+              </div>
+              <div>
+                <h1 className="text-3xl md:text-4xl font-bold">
+                  Welcome back, {getFirstName()}! 👋
+                </h1>
+                <p className="text-gray-400 text-lg">
+                  Here's what's happening with your NJIA SAFE experience today.
+                </p>
               </div>
             </div>
             
-            {/* Welcome Text */}
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold">
-                Welcome back, <span className="text-njia-orange">Premium User</span>
-              </h1>
-              <p className="text-gray-400 mt-2">Your safety dashboard is optimized for today's journey</p>
-              {/* New Slogan - Full width on mobile */}
-              <div className="flex items-center space-x-2 mt-3">
-                <FiGlobe className="text-njia-orange w-5 h-5 flex-shrink-0" />
-                <p className="text-njia-darkblue font-semibold text-base md:text-lg">
-                  Smart Navigation Built for Africa
-                </p>
+            <div className="flex flex-wrap items-center gap-4">
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
+                <span className="text-sm text-gray-300">{getAccountStatus()}</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                  getPlanType() === 'PREMIUM' 
+                    ? 'bg-gradient-to-r from-yellow-500 to-orange-500' 
+                    : getPlanType() === 'ENTERPRISE'
+                    ? 'bg-gradient-to-r from-purple-500 to-pink-500'
+                    : 'bg-gradient-to-r from-blue-500 to-cyan-500'
+                }`}>
+                  {getPlanType()} PLAN
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <FiClock className="text-gray-400" />
+                <span className="text-sm text-gray-300">
+                  {daysRemaining} days remaining
+                </span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <FiCalendar className="text-gray-400" />
+                <span className="text-sm text-gray-300">
+                  Expires: {userData ? formatDate(userData.expiresAt) : 'N/A'}
+                </span>
               </div>
             </div>
           </div>
           
-          {/* Stats Summary - Hide on small screens */}
-          <div className="hidden lg:flex items-center space-x-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-njia-darkblue">NJIA</div>
-              <div className="text-xs text-gray-400">Navigation</div>
-            </div>
-            <div className="h-8 w-px bg-gray-700"></div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-njia-orange">SAFE</div>
-              <div className="text-xs text-gray-400">Security</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {stats.map((stat, index) => (
-          <Link key={stat.label} to={stat.link}>
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              animate={{ opacity: 1, y: 0 }} 
-              transition={{ delay: index * 0.1 }} 
-              className="bg-premium-card rounded-xl p-6 border border-gray-800 hover:border-njia-orange/50 transition-colors cursor-pointer h-full"
-            >
-              <div className="flex items-center justify-between">
-                <div className={`p-3 rounded-lg bg-gray-900 ${stat.color}`}>{stat.icon}</div>
-                <span className="text-sm text-gray-400">{stat.change}</span>
-              </div>
-              <h3 className="text-2xl font-bold mt-4">{stat.value}</h3>
-              <p className="text-gray-400 mt-1">{stat.label}</p>
-            </motion.div>
-          </Link>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column - Travel & Quick Actions */}
-        <div className="lg:col-span-2 space-y-8">
-          {/* Travel Mode Selector */}
-          <div className="bg-premium-card rounded-xl p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-gray-300">Plan Your Journey</h3>
-              <span className="text-xs px-2 py-1 bg-green-500/20 text-green-500 rounded">Live Traffic</span>
-            </div>
-            <TravelModeSelector mode={travelMode} setMode={setTravelMode} />
-            <div className="mt-6 grid grid-cols-2 gap-4">
-              <AnimatedButton onClick={handleStartNavigation} fullWidth>
-                <FiNavigation className="mr-2" />
-                Start Navigation
-              </AnimatedButton>
-              <AnimatedButton onClick={handleViewMap} variant="outline" fullWidth>
-                <FiMap className="mr-2" />
-                View Map
-              </AnimatedButton>
-            </div>
-          </div>
-
-          {/* Quick Actions */}
-          <div className="bg-premium-card rounded-xl p-6">
-            <h3 className="text-lg font-semibold mb-6 text-gray-300">Quick Actions</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {quickActions.map((action, index) => (
-                <Link key={action.label} to={action.link}>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="flex flex-col items-center p-4 rounded-xl bg-gray-900/50 hover:bg-gray-900 border border-gray-800 hover:border-gray-700 transition-all w-full"
-                  >
-                    <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${action.color} flex items-center justify-center mb-3`}>
-                      <span className="text-xl text-white">{action.icon}</span>
-                    </div>
-                    <h4 className="font-bold text-sm mb-1">{action.label}</h4>
-                    <p className="text-xs text-gray-400 text-center">{action.description}</p>
-                  </motion.button>
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          {/* Recent Activity */}
-          <div className="bg-premium-card rounded-xl p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-gray-300">Recent Activity</h3>
-              <Link to="/notifications" className="text-sm text-njia-orange hover:text-orange-400">
-                View All
-              </Link>
-            </div>
-            <div className="space-y-4">
-              {[
-                { time: '10:30 AM', action: 'Route optimized for traffic', icon: '🔄', color: 'text-blue-500' },
-                { time: '09:15 AM', action: 'Payment received - Premium Plan', icon: '💰', color: 'text-green-500' },
-                { time: 'Yesterday', action: 'Safety alert: Road construction', icon: '⚠️', color: 'text-yellow-500' },
-                { time: '2 days ago', action: 'Insurance claim submitted', icon: '🛡️', color: 'text-red-500' }
-              ].map((activity, index) => (
-                <div key={index} className="flex items-center space-x-4 p-3 rounded-lg bg-gray-900/50">
-                  <div className={`text-2xl ${activity.color}`}>{activity.icon}</div>
-                  <div className="flex-1">
-                    <p className="font-medium">{activity.action}</p>
-                    <p className="text-sm text-gray-400">{activity.time}</p>
-                  </div>
-                  <FiCheckCircle className="text-green-500" />
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Right Column - Payment & Insurance */}
-        <div className="space-y-8">
-          {/* Payment Status */}
-          <div className="bg-premium-card rounded-xl p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-gray-300">Payment Status</h3>
-              <span className="text-xs px-2 py-1 bg-green-500/20 text-green-500 rounded">Active</span>
-            </div>
-            
-            <div className="space-y-4 mb-6">
-              {recentPayments.map((payment) => (
-                <div key={payment.id} className="flex items-center justify-between p-3 rounded-lg bg-gray-900/50">
-                  <div>
-                    <p className="font-medium">{payment.service}</p>
-                    <p className="text-sm text-gray-400">{payment.date} • {payment.method}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold">{payment.amount}</p>
-                    <span className={`text-xs px-2 py-1 rounded ${
-                      payment.status === 'paid' ? 'bg-green-500/20 text-green-500' : 'bg-yellow-500/20 text-yellow-500'
-                    }`}>
-                      {payment.status}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <AnimatedButton onClick={handleMakeNewPayment} fullWidth>
-              <FiDollarSign className="mr-2" />
-              Make New Payment
-              <FiArrowRight className="ml-2" />
-            </AnimatedButton>
-          </div>
-
-          {/* Insurance Benefits */}
-          <div className="bg-gradient-to-br from-red-500/10 to-red-600/10 border border-red-500/20 rounded-xl p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-gray-300">Insurance Benefits</h3>
-              <FiShield className="text-red-500" />
-            </div>
-            
-            <div className="space-y-3 mb-6">
-              {insuranceBenefits.map((benefit, index) => (
-                <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-gray-900/30">
-                  <div>
-                    <p className="font-medium">{benefit.benefit}</p>
-                    <p className="text-xs text-gray-400">Status: {benefit.status}</p>
-                  </div>
-                  <p className="font-bold text-red-400">{benefit.value}</p>
-                </div>
-              ))}
-            </div>
-
-            <AnimatedButton onClick={handleCheckInsurance} variant="secondary" fullWidth>
-              <FiShield className="mr-2" />
-              View Insurance Details
-            </AnimatedButton>
-          </div>
-
-          {/* Subscription Status */}
-          <div className="bg-gradient-to-br from-njia-darkblue/10 to-njia-purple/10 border border-njia-purple/20 rounded-xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-300">Your Plan</h3>
-                <p className="text-2xl font-bold text-njia-orange">Premium</p>
-              </div>
-              <FiZap className="text-yellow-500 text-2xl" />
-            </div>
-            
-            <div className="space-y-3 mb-6">
-              <div className="flex items-center justify-between">
-                <span className="text-gray-400">Renewal Date</span>
-                <span className="font-medium">Jan 15, 2024</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-400">Monthly Cost</span>
-                <span className="font-bold text-green-500">Ksh 899</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-400">Status</span>
-                <span className="px-2 py-1 bg-green-500/20 text-green-500 text-xs rounded">Active</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <button onClick={handleManagePlan} className="w-full py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors text-sm">
-                Manage Plan
-              </button>
-              <button onClick={handleUpgrade} className="w-full py-2 bg-njia-orange hover:bg-orange-600 rounded-lg transition-colors text-sm">
-                Upgrade
-              </button>
-            </div>
-          </div>
-
-          {/* Logo Branding Card */}
-          <div className="bg-gradient-to-br from-njia-darkblue/20 to-njia-orange/20 border border-gray-800 rounded-xl p-6">
-            <div className="flex flex-col items-center text-center">
-              <div className="relative w-20 h-20 mb-4">
-                {/* Circular logo */}
-                <div className="absolute inset-0 rounded-full overflow-hidden bg-gray-900 flex items-center justify-center p-2">
-                  <img 
-                    src={logoUrl}
-                    alt="NJIA SAFE Logo" 
-                    className="w-full h-full object-contain"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.style.display = 'none';
-                      const fallback = document.createElement('div');
-                      fallback.className = 'flex flex-col items-center justify-center h-full w-full';
-                      fallback.innerHTML = `
-                        <div class="text-2xl font-bold">
-                          <span class="text-njia-darkblue">NJIA</span>
-                          <span class="text-njia-orange"> SAFE</span>
-                        </div>
-                      `;
-                      e.target.parentNode.appendChild(fallback);
-                    }}
-                  />
-                </div>
-              </div>
-              
-              <h2 className="text-2xl font-bold mb-2">
-                <span className="text-njia-darkblue">NJIA</span>
-                <span className="text-njia-orange"> SAFE</span>
-              </h2>
-              <p className="text-gray-400 text-sm mb-2">
-                Secure Navigation & Community Platform
-              </p>
-              {/* New Slogan */}
-              <div className="flex items-center justify-center space-x-1 mt-1">
-                <FiGlobe className="text-njia-orange w-3 h-3" />
-                <p className="text-njia-darkblue font-semibold text-xs">
-                  Smart Navigation Built for Africa
+          <div className="mt-4 md:mt-0">
+            <div className="flex items-center space-x-3 p-4 bg-gray-800/50 rounded-xl border border-gray-700">
+              <div className="text-right">
+                <p className="text-sm text-gray-400">Today's Date</p>
+                <p className="text-xl font-bold">{new Date().toLocaleDateString('en-US', { 
+                  weekday: 'long', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}</p>
+                <p className="text-xs text-gray-400 mt-1">
+                  {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </p>
               </div>
-              
-              <div className="mt-4 flex space-x-2">
-                <div className="w-3 h-3 rounded-full bg-njia-darkblue"></div>
-                <div className="w-3 h-3 rounded-full bg-njia-purple"></div>
-                <div className="w-3 h-3 rounded-full bg-njia-orange"></div>
-              </div>
+              <FiCalendar className="text-3xl text-blue-400" />
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      {/* Bottom CTA */}
-      <motion.div 
+      {/* Stats Overview */}
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="mt-8 bg-gradient-to-r from-njia-darkblue to-njia-orange rounded-xl p-6"
+        transition={{ duration: 0.5, delay: 0.1 }}
+        className="mb-8"
       >
-        <div className="flex flex-col md:flex-row items-center justify-between">
-          <div className="flex items-center space-x-4 mb-4 md:mb-0">
-            <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gray-900 flex items-center justify-center">
+        <h2 className="text-2xl font-bold mb-4 flex items-center">
+          <FiActivity className="mr-2 text-blue-400" />
+          Your Journey Overview
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {statCards.map((stat, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
+              className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-5 border border-gray-700 hover:border-blue-500/30 transition-all duration-300"
+            >
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-gray-400 text-sm mb-2">{stat.label}</p>
+                  <p className="text-2xl font-bold">{stat.value}</p>
+                  <p className="text-green-400 text-sm mt-2 flex items-center">
+                    <FiTrendingUp className="mr-1" /> {stat.change}
+                  </p>
+                </div>
+                <div className={`p-3 rounded-lg ${stat.bgColor} ${stat.color}`}>
+                  {stat.icon}
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Quick Actions */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="mb-8"
+      >
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold flex items-center">
+            <FiNavigation className="mr-2 text-orange-400" />
+            Quick Actions
+          </h2>
+          <Link to="/settings" className="text-blue-400 hover:text-blue-300 text-sm flex items-center">
+            <FiSettings className="mr-1" />
+            View All Features
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+          {quickActions.map((action, index) => (
+            <motion.div
+              key={index}
+              whileHover={{ scale: 1.05, y: -5 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Link
+                to={action.path}
+                className={`block bg-gradient-to-br ${action.color} rounded-xl p-5 text-center shadow-xl hover:shadow-2xl transition-all duration-300`}
+              >
+                <div className="mb-3 flex justify-center">
+                  <div className="p-3 rounded-full bg-white/10 backdrop-blur-sm">
+                    {action.icon}
+                  </div>
+                </div>
+                <h3 className="font-bold text-lg mb-1">{action.title}</h3>
+                <p className="text-sm opacity-90">{action.description}</p>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Recent Activity */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700"
+        >
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold flex items-center">
+              <FiClock className="mr-2 text-orange-400" />
+              Recent Activity
+            </h2>
+            <Link to="/notifications" className="text-blue-400 hover:text-blue-300 text-sm flex items-center">
+              <FiCheckCircle className="mr-1" />
+              See All
+            </Link>
+          </div>
+          <div className="space-y-4">
+            {recentActivity.map((activity) => (
+              <div
+                key={activity.id}
+                className="flex items-center p-4 rounded-lg bg-gray-900/50 hover:bg-gray-800/70 transition-colors group"
+              >
+                <div className={`p-3 rounded-lg ${activity.bgColor} ${activity.color} mr-4 group-hover:scale-110 transition-transform`}>
+                  {activity.icon}
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-bold">{activity.title}</h4>
+                  <p className="text-gray-400 text-sm">{activity.time}</p>
+                </div>
+                <button className="text-blue-400 hover:text-blue-300 text-sm flex items-center">
+                  View <FiNavigation className="ml-1" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Account Status */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="bg-gradient-to-br from-blue-900/30 to-orange-900/30 backdrop-blur-sm rounded-xl p-6 border border-blue-700/30"
+        >
+          <div className="flex items-center mb-6">
+            <FiShield className="text-2xl text-blue-400 mr-3" />
+            <h2 className="text-2xl font-bold">
+              <span className="text-blue-400">NJIA</span>{' '}
+              <span className="text-orange-400">SAFE</span> Account
+            </h2>
+          </div>
+          
+          {/* Account Details */}
+          <div className="space-y-4 mb-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-gray-900/50 rounded-lg p-4">
+                <p className="text-gray-400 text-sm mb-1">Plan Type</p>
+                <p className="text-xl font-bold text-orange-400">{getPlanType()}</p>
+              </div>
+              <div className="bg-gray-900/50 rounded-lg p-4">
+                <p className="text-gray-400 text-sm mb-1">Status</p>
+                <p className={`text-xl font-bold ${
+                  getAccountStatus() === 'ACTIVE' ? 'text-green-400' : 'text-red-400'
+                }`}>
+                  {getAccountStatus()}
+                </p>
+              </div>
+            </div>
+            
+            <div className="bg-gray-900/50 rounded-lg p-4">
+              <div className="flex justify-between items-center mb-2">
+                <p className="text-gray-400">Subscription Progress</p>
+                <p className="font-bold text-blue-400">{daysRemaining} days left</p>
+              </div>
+              <div className="w-full bg-gray-700 rounded-full h-2">
+                <div 
+                  className="bg-gradient-to-r from-blue-500 to-orange-500 h-2 rounded-full" 
+                  style={{ width: `${Math.min(100, (daysRemaining / 365) * 100)}%` }}
+                ></div>
+              </div>
+              <div className="flex justify-between text-sm text-gray-400 mt-2">
+                <span>Started: {userData ? formatDate(userData.startedAt) : 'N/A'}</span>
+                <span>Expires: {userData ? formatDate(userData.expiresAt) : 'N/A'}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Account Features */}
+          <div className="space-y-4">
+            {premiumFeatures.map((feature, index) => (
+              <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+                <div className="flex items-center space-x-3">
+                  {feature.icon}
+                  <div>
+                    <p className="font-bold">{feature.title}</p>
+                    <p className="text-gray-400 text-sm">{feature.description}</p>
+                  </div>
+                </div>
+                <Link 
+                  to={feature.path} 
+                  className={`px-4 py-2 ${feature.buttonColor} rounded text-sm transition-colors flex items-center`}
+                >
+                  {feature.buttonText} <FiNavigation className="ml-1" />
+                </Link>
+              </div>
+            ))}
+          </div>
+          
+          {/* Trial Status */}
+          {userData && userData.trial === false && (
+            <div className="mt-6 p-4 bg-gradient-to-r from-green-900/20 to-emerald-900/20 rounded-lg border border-green-700/30">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-bold flex items-center">
+                    <FiCheckCircle className="mr-2 text-green-400" />
+                    Full Subscription Active
+                  </h3>
+                  <p className="text-gray-400 text-sm mt-1">
+                    You're on a full premium plan. No trial restrictions apply.
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold text-green-400">100%</p>
+                  <p className="text-xs text-gray-400">Active</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </motion.div>
+      </div>
+
+      {/* Bottom Info Bar */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.5 }}
+        className="mt-8 p-4 bg-gray-800/30 backdrop-blur-sm rounded-xl border border-gray-700"
+      >
+        <div className="flex flex-col md:flex-row md:items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-700">
               <img 
-                src={logoUrl}
-                alt="NJIA SAFE Logo" 
-                className="w-10 h-10 object-contain"
+                src="https://media.licdn.com/dms/image/v2/D4D22AQG0Atyt2w2ZFQ/feedshare-shrink_800/B4DZsegFI0K8Ag-/0/1765743287150?e=1769644800&v=beta&t=V7uxIxe8F4wdKGtZV1dK5Es4vQeMVFohcxtotEeb-Yw" 
+                alt="NJIA SAFE Logo"
+                className="w-full h-full object-cover"
               />
             </div>
             <div>
-              <h3 className="text-xl font-bold">Complete Your Safety Profile</h3>
-              <p className="text-gray-300">Update payment methods and insurance details for full protection</p>
-              <div className="flex items-center space-x-1 mt-1">
-                <FiGlobe className="text-yellow-300 w-3 h-3" />
-                <p className="text-yellow-100 text-sm font-medium">
-                  Smart Navigation Built for Africa
-                </p>
-              </div>
+              <p className="font-bold">
+                <span className="text-blue-400">NJIA</span>{' '}
+                <span className="text-orange-400">SAFE</span> Dashboard
+              </p>
+              <p className="text-sm text-gray-400">Your complete safety and navigation companion</p>
             </div>
           </div>
-          <div className="flex space-x-3">
-            <AnimatedButton onClick={handleUpdatePayment} variant="secondary">
-              <FiDollarSign className="mr-2" />
-              Update Payment
-            </AnimatedButton>
-            <AnimatedButton onClick={handleCheckInsurance}>
-              <FiShield className="mr-2" />
-              Check Insurance
-            </AnimatedButton>
+          <div className="flex items-center space-x-4 mt-4 md:mt-0">
+            <div className="text-center">
+              <p className="text-2xl font-bold text-blue-400">24/7</p>
+              <p className="text-xs text-gray-400">Support</p>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl font-bold text-green-400">99.9%</p>
+              <p className="text-xs text-gray-400">Uptime</p>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl font-bold text-orange-400">
+                <FiZap className="inline mr-1" />
+                5.0
+              </p>
+              <p className="text-xs text-gray-400">Rating</p>
+            </div>
           </div>
         </div>
       </motion.div>

@@ -20,30 +20,47 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import AIAssistant from './pages/AIAssistant';
 import Notifications from './pages/Notifications';
+import { setupDefaultUser } from './utils/setupDefaultUser';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(true); // Set to true for testing
-  const [language, setLanguage] = useState('en');
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [subscription, setSubscription] = useState('premium');
 
   useEffect(() => {
-    setTimeout(() => setIsLoading(false), 2000);
+    // Setup default user for demo
+    setupDefaultUser();
+    
+    setTimeout(() => setIsLoading(false), 500);
     const token = localStorage.getItem('njiasafe_token');
-    const userSub = localStorage.getItem('njiasafe_subscription');
-    if (token) {
-      setIsAuthenticated(true);
-      setSubscription(userSub || 'premium');
+    const userData = localStorage.getItem('njiasafe_user');
+    
+    if (token && userData) {
+      try {
+        const parsedData = JSON.parse(userData);
+        setIsAuthenticated(true);
+        setSubscription(parsedData.plan?.toLowerCase() || parsedData.subscription || 'premium');
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+      }
     }
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('njiasafe_user');
+    localStorage.removeItem('njiasafe_token');
+    setIsAuthenticated(false);
+  };
 
   if (isLoading) return <LoadingScreen />;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-premium-dark via-gray-900 to-gray-900 text-white">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-gray-950 text-white">
       <Toaster position="top-right" toastOptions={{ style: { background: '#1a1f36', color: '#fff', border: '1px solid #ff6d00' } }} />
-      {isAuthenticated && <Header language={language} setLanguage={setLanguage} subscription={subscription} />}
-      <main className={`${isAuthenticated ? 'pt-28 pb-8' : 'pt-0 pb-8'} min-h-screen`}>
+      
+      {isAuthenticated && <Header subscription={subscription} onLogout={handleLogout} />}
+      
+      <main className={`${isAuthenticated ? 'pt-4' : 'pt-0'} min-h-screen`}>
         <Routes>
           <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
           <Route path="/register" element={<Register />} />
@@ -61,10 +78,10 @@ function App() {
           <Route path="/settings" element={isAuthenticated ? <Settings /> : <Navigate to="/login" />} />
           <Route path="/ai-assistant" element={isAuthenticated ? <AIAssistant /> : <Navigate to="/login" />} />
           <Route path="/notifications" element={isAuthenticated ? <Notifications /> : <Navigate to="/login" />} />
-          {/* Catch-all route to handle unknown paths */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
+      
       {isAuthenticated && <Footer />}
     </div>
   );

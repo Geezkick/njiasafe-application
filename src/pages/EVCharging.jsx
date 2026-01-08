@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FiBatteryCharging, FiMapPin, FiClock, FiDollarSign, FiStar, FiFilter, FiNavigation, FiAlertCircle, FiCheckCircle, FiWifi } from 'react-icons/fi';
 import AnimatedButton from '../components/AnimatedButton';
+import { useTranslation } from '../hooks/useTranslation';
 
 const EVCharging = () => {
   const [selectedStation, setSelectedStation] = useState(null);
   const [filter, setFilter] = useState('all');
+  const { t } = useTranslation();
 
   const stations = [
     { id: 1, name: 'Green Energy Hub', location: 'Westlands, Nairobi', distance: '2.3 km', available: 4, total: 6, price: 'KES 45/kWh', rating: 4.8, fastCharging: true, amenities: ['Cafe', 'WiFi', 'Restroom'], status: 'available' },
@@ -15,10 +17,10 @@ const EVCharging = () => {
   ];
 
   const filters = [
-    { id: 'all', label: 'All Stations' },
-    { id: 'available', label: 'Available Now' },
-    { id: 'fast', label: 'Fast Charging' },
-    { id: 'premium', label: 'Premium Amenities' }
+    { id: 'all', label: t('all_stations') },
+    { id: 'available', label: t('available_now') },
+    { id: 'fast', label: t('fast_charging') },
+    { id: 'premium', label: t('premium_amenities') }
   ];
 
   const filteredStations = stations.filter(station => {
@@ -37,15 +39,18 @@ const EVCharging = () => {
   };
 
   return (
-    <div className="animate-fade-in">
+    <div className="animate-fade-in pt-4 px-4 md:px-6">
       <div className="mb-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">EV Charging</h1>
-            <p className="text-gray-400 mt-2">Find and book charging stations across the city</p>
+            <h1 className="text-3xl font-bold">{t('ev_charging')}</h1>
+            <p className="text-gray-400 mt-2">{t('find_book_charging_stations')}</p>
           </div>
           <div className="mt-4 md:mt-0">
-            <AnimatedButton variant="secondary"><FiBatteryCharging className="mr-2" />My Charging History</AnimatedButton>
+            <AnimatedButton variant="secondary">
+              <FiBatteryCharging className="mr-2" />
+              {t('my_charging_history')}
+            </AnimatedButton>
           </div>
         </div>
       </div>
@@ -64,7 +69,11 @@ const EVCharging = () => {
           <div className="bg-premium-card rounded-xl p-6">
             <div className="flex flex-wrap gap-2">
               {filters.map((filterItem) => (
-                <button key={filterItem.id} onClick={() => setFilter(filterItem.id)} className={`px-4 py-2 rounded-lg transition-colors ${filter === filterItem.id ? 'bg-njia-orange text-white' : 'bg-gray-800 hover:bg-gray-700'}`}>
+                <button 
+                  key={filterItem.id} 
+                  onClick={() => setFilter(filterItem.id)} 
+                  className={`px-4 py-2 rounded-lg transition-colors ${filter === filterItem.id ? 'bg-njia-orange text-white' : 'bg-gray-800 hover:bg-gray-700'}`}
+                >
                   {filterItem.label}
                 </button>
               ))}
@@ -73,20 +82,34 @@ const EVCharging = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {filteredStations.map((station) => (
-              <motion.div key={station.id} whileHover={{ y: -5 }} onClick={() => setSelectedStation(station)} className={`bg-premium-card rounded-xl overflow-hidden border-2 cursor-pointer transition-all ${selectedStation?.id === station.id ? 'border-njia-orange' : 'border-gray-800 hover:border-gray-700'}`}>
+              <motion.div 
+                key={station.id} 
+                whileHover={{ y: -5 }} 
+                onClick={() => setSelectedStation(station)} 
+                className={`bg-premium-card rounded-xl overflow-hidden border-2 cursor-pointer transition-all ${selectedStation?.id === station.id ? 'border-njia-orange' : 'border-gray-800 hover:border-gray-700'}`}
+              >
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-4">
                     <div>
                       <h3 className="text-lg font-bold">{station.name}</h3>
-                      <div className="flex items-center text-gray-400 mt-1"><FiMapPin className="mr-1" /><span className="text-sm">{station.location}</span></div>
+                      <div className="flex items-center text-gray-400 mt-1">
+                        <FiMapPin className="mr-1" />
+                        <span className="text-sm">{station.location}</span>
+                      </div>
                     </div>
-                    {station.fastCharging && <span className="px-2 py-1 text-xs bg-gradient-to-r from-njia-orange to-orange-600 rounded">FAST</span>}
+                    {station.fastCharging && (
+                      <span className="px-2 py-1 text-xs bg-gradient-to-r from-njia-orange to-orange-600 rounded">
+                        {t('fast_charging').toUpperCase()}
+                      </span>
+                    )}
                   </div>
 
                   <div className="mb-4">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-gray-400">Availability</span>
-                      <span className={`font-bold ${station.available > 0 ? 'text-green-500' : 'text-red-500'}`}>{station.available}/{station.total} available</span>
+                      <span className="text-gray-400">{t('availability')}</span>
+                      <span className={`font-bold ${station.available > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                        {station.available}/{station.total} {t('available').toLowerCase()}
+                      </span>
                     </div>
                     <div className="w-full h-2 bg-gray-800 rounded-full overflow-hidden">
                       <div className="h-full bg-gradient-to-r from-green-500 to-yellow-500" style={{ width: `${(station.available / station.total) * 100}%` }} />
@@ -94,18 +117,48 @@ const EVCharging = () => {
                   </div>
 
                   <div className="grid grid-cols-2 gap-4 mb-4">
-                    <div className="flex items-center space-x-2"><FiNavigation className="text-gray-400" /><div><p className="text-sm text-gray-400">Distance</p><p className="font-medium">{station.distance}</p></div></div>
-                    <div className="flex items-center space-x-2"><FiDollarSign className="text-gray-400" /><div><p className="text-sm text-gray-400">Price</p><p className="font-medium">{station.price}</p></div></div>
-                    <div className="flex items-center space-x-2"><FiStar className="text-gray-400" /><div><p className="text-sm text-gray-400">Rating</p><p className="font-medium">{station.rating}</p></div></div>
-                    <div className="flex items-center space-x-2"><FiClock className="text-gray-400" /><div><p className="text-sm text-gray-400">Status</p><p className={`font-medium ${station.status === 'available' ? 'text-green-500' : 'text-yellow-500'}`}>{station.status}</p></div></div>
+                    <div className="flex items-center space-x-2">
+                      <FiNavigation className="text-gray-400" />
+                      <div>
+                        <p className="text-sm text-gray-400">{t('distance')}</p>
+                        <p className="font-medium">{station.distance}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <FiDollarSign className="text-gray-400" />
+                      <div>
+                        <p className="text-sm text-gray-400">{t('price')}</p>
+                        <p className="font-medium">{station.price}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <FiStar className="text-gray-400" />
+                      <div>
+                        <p className="text-sm text-gray-400">{t('rating')}</p>
+                        <p className="font-medium">{station.rating}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <FiClock className="text-gray-400" />
+                      <div>
+                        <p className="text-sm text-gray-400">{t('status')}</p>
+                        <p className={`font-medium ${station.status === 'available' ? 'text-green-500' : 'text-yellow-500'}`}>
+                          {station.status}
+                        </p>
+                      </div>
+                    </div>
                   </div>
 
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {station.amenities.map((amenity, index) => (<span key={index} className="px-2 py-1 text-xs bg-gray-800 rounded">{amenity}</span>))}
+                    {station.amenities.map((amenity, index) => (
+                      <span key={index} className="px-2 py-1 text-xs bg-gray-800 rounded">
+                        {amenity}
+                      </span>
+                    ))}
                   </div>
 
                   <AnimatedButton fullWidth disabled={station.available === 0} variant={station.available > 0 ? 'primary' : 'outline'}>
-                    {station.available > 0 ? 'Book Charging Slot' : 'Fully Booked'}
+                    {station.available > 0 ? t('book_charging_slot') : t('fully_booked')}
                   </AnimatedButton>
                 </div>
               </motion.div>
@@ -116,38 +169,64 @@ const EVCharging = () => {
         <div className="space-y-8">
           {selectedStation ? (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-gradient-to-br from-njia-darkblue to-njia-purple rounded-xl p-6">
-              <h3 className="text-lg font-semibold mb-4">Selected Station</h3>
+              <h3 className="text-lg font-semibold mb-4">{t('selected_station')}</h3>
               <div className="space-y-3">
-                <div className="flex justify-between"><span>Station</span><span className="font-bold">{selectedStation.name}</span></div>
-                <div className="flex justify-between"><span>Location</span><span className="font-bold">{selectedStation.location}</span></div>
-                <div className="flex justify-between"><span>Distance</span><span className="font-bold">{selectedStation.distance}</span></div>
-                <div className="flex justify-between"><span>Available Slots</span><span className="font-bold">{selectedStation.available}/{selectedStation.total}</span></div>
-                <div className="flex justify-between"><span>Price</span><span className="font-bold">{selectedStation.price}</span></div>
-                <div className="flex justify-between"><span>Fast Charging</span><span className="font-bold">{selectedStation.fastCharging ? 'Yes' : 'No'}</span></div>
-              </div>
-
-              <div className="mt-6">
-                <h4 className="font-semibold mb-2">Amenities</h4>
-                <div className="flex flex-wrap gap-2">
-                  {selectedStation.amenities.map((amenity, index) => (<span key={index} className="px-3 py-1 bg-white/20 rounded-lg text-sm">{amenity}</span>))}
+                <div className="flex justify-between">
+                  <span>{t('station')}</span>
+                  <span className="font-bold">{selectedStation.name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>{t('location')}</span>
+                  <span className="font-bold">{selectedStation.location}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>{t('distance')}</span>
+                  <span className="font-bold">{selectedStation.distance}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>{t('available_slots')}</span>
+                  <span className="font-bold">{selectedStation.available}/{selectedStation.total}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>{t('price')}</span>
+                  <span className="font-bold">{selectedStation.price}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>{t('fast_charging_available')}</span>
+                  <span className="font-bold">{selectedStation.fastCharging ? t('yes') : t('no')}</span>
                 </div>
               </div>
 
-              <AnimatedButton fullWidth className="mt-6">Book Now</AnimatedButton>
+              <div className="mt-6">
+                <h4 className="font-semibold mb-2">{t('amenities')}</h4>
+                <div className="flex flex-wrap gap-2">
+                  {selectedStation.amenities.map((amenity, index) => (
+                    <span key={index} className="px-3 py-1 bg-white/20 rounded-lg text-sm">
+                      {amenity}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <AnimatedButton fullWidth className="mt-6">
+                {t('book_now')}
+              </AnimatedButton>
             </motion.div>
           ) : (
             <div className="bg-premium-card rounded-xl p-6 text-center">
-              <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4"><FiBatteryCharging className="w-8 h-8 text-gray-400" /></div>
-              <h3 className="text-lg font-semibold mb-2">Select a Station</h3>
+              <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                <FiBatteryCharging className="w-8 h-8 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">{t('select_a_station')}</h3>
               <p className="text-gray-400">Click on a charging station to view details and book</p>
             </div>
           )}
 
           <div className="bg-premium-card rounded-xl p-6">
-            <h3 className="text-lg font-semibold mb-4 text-gray-300">Quick Booking</h3>
+            <h3 className="text-lg font-semibold mb-4 text-gray-300">{t('quick_booking')}</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Vehicle Type</label>
+                <label className="block text-sm text-gray-400 mb-2">{t('vehicle_type')}</label>
                 <select className="w-full px-4 py-3 bg-gray-900 border border-gray-800 rounded-lg focus:outline-none focus:border-njia-orange">
                   <option>Tesla Model 3</option>
                   <option>Nissan Leaf</option>
@@ -156,7 +235,7 @@ const EVCharging = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Charging Duration</label>
+                <label className="block text-sm text-gray-400 mb-2">{t('charging_duration')}</label>
                 <select className="w-full px-4 py-3 bg-gray-900 border border-gray-800 rounded-lg focus:outline-none focus:border-njia-orange">
                   <option>30 minutes (Fast)</option>
                   <option>1 hour (Standard)</option>
@@ -165,7 +244,7 @@ const EVCharging = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Payment Method</label>
+                <label className="block text-sm text-gray-400 mb-2">{t('payment_method')}</label>
                 <select className="w-full px-4 py-3 bg-gray-900 border border-gray-800 rounded-lg focus:outline-none focus:border-njia-orange">
                   <option>M-Pesa</option>
                   <option>Debit Card</option>
@@ -173,20 +252,34 @@ const EVCharging = () => {
                   <option>Prepaid Balance</option>
                 </select>
               </div>
-              <AnimatedButton fullWidth>Find Available Stations</AnimatedButton>
+              <AnimatedButton fullWidth>
+                {t('find_available_stations')}
+              </AnimatedButton>
             </div>
           </div>
 
           <div className="bg-premium-card rounded-xl p-6">
-            <h3 className="text-lg font-semibold mb-4 text-gray-300">Environmental Impact</h3>
+            <h3 className="text-lg font-semibold mb-4 text-gray-300">{t('environmental_impact')}</h3>
             <div className="space-y-3">
               <div className="flex justify-between items-center p-3 rounded-lg bg-gray-900/50">
-                <div><p className="font-medium">Carbon Saved</p><p className="text-sm text-gray-400">This month</p></div>
-                <div className="text-right"><p className="text-xl font-bold text-green-500">2.3 tons</p><p className="text-xs text-gray-400">CO₂ equivalent</p></div>
+                <div>
+                  <p className="font-medium">{t('carbon_saved_month')}</p>
+                  <p className="text-sm text-gray-400">{t('this_month')}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xl font-bold text-green-500">2.3 tons</p>
+                  <p className="text-xs text-gray-400">CO₂ equivalent</p>
+                </div>
               </div>
               <div className="flex justify-between items-center p-3 rounded-lg bg-gray-900/50">
-                <div><p className="font-medium">Money Saved</p><p className="text-sm text-gray-400">vs. gasoline</p></div>
-                <div className="text-right"><p className="text-xl font-bold text-njia-orange">KES 12,450</p><p className="text-xs text-gray-400">This month</p></div>
+                <div>
+                  <p className="font-medium">{t('money_saved')}</p>
+                  <p className="text-sm text-gray-400">{t('vs_gasoline')}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xl font-bold text-njia-orange">KES 12,450</p>
+                  <p className="text-xs text-gray-400">{t('this_month')}</p>
+                </div>
               </div>
             </div>
             <div className="mt-4 pt-4 border-t border-gray-800">
@@ -197,13 +290,15 @@ const EVCharging = () => {
       </div>
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-8 bg-gradient-to-r from-njia-darkblue via-njia-purple to-njia-darkblue rounded-xl p-8">
-        <div className="flex flex-col md:flexRow items-center justify-between">
+        <div className="flex flex-col md:flex-row items-center justify-between">
           <div>
             <h3 className="text-2xl font-bold mb-2">Premium Charging Benefits</h3>
             <p className="text-gray-300">Access exclusive stations, faster charging, and priority booking with Premium</p>
           </div>
           <div className="mt-4 md:mt-0">
-            <AnimatedButton variant="secondary" size="large">Upgrade to Premium</AnimatedButton>
+            <AnimatedButton variant="secondary" size="large">
+              {t('upgrade_to_premium')}
+            </AnimatedButton>
           </div>
         </div>
       </motion.div>

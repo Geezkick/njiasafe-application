@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FiMap, FiNavigation, FiFilter, FiLayers, FiSearch, FiAlertTriangle, FiEye, FiEyeOff, FiSettings, FiDownload, FiShare2, FiTarget, FiZoomIn, FiZoomOut } from 'react-icons/fi';
 import AnimatedButton from '../components/AnimatedButton';
+import { useTranslation } from '../hooks/useTranslation';
 
 const SmartMap = ({ subscription }) => {
   const [mapLayers, setMapLayers] = useState({
@@ -21,21 +22,23 @@ const SmartMap = ({ subscription }) => {
     avgSpeed: '45 km/h',
     safetyScore: '8.9/10'
   });
+  
+  const { t } = useTranslation();
 
   const mapLayersList = [
-    { id: 'traffic', name: 'Traffic Flow', icon: '🚗', color: 'text-blue-500', premium: false },
-    { id: 'safety', name: 'Safety Heatmap', icon: '🛡️', color: 'text-green-500', premium: false },
-    { id: 'evStations', name: 'EV Stations', icon: '⚡', color: 'text-yellow-500', premium: true },
-    { id: 'police', name: 'Police Patrols', icon: '👮', color: 'text-blue-400', premium: true },
-    { id: 'accidents', name: 'Accident Zones', icon: '⚠️', color: 'text-red-500', premium: false },
-    { id: 'roadQuality', name: 'Road Quality', icon: '🛣️', color: 'text-orange-500', premium: true }
+    { id: 'traffic', name: t('traffic_flow'), icon: '🚗', color: 'text-blue-500', premium: false },
+    { id: 'safety', name: t('safety_heatmap'), icon: '🛡️', color: 'text-green-500', premium: false },
+    { id: 'evStations', name: t('ev_stations'), icon: '⚡', color: 'text-yellow-500', premium: true },
+    { id: 'police', name: t('police_patrols'), icon: '👮', color: 'text-blue-400', premium: true },
+    { id: 'accidents', name: t('accident_zones'), icon: '⚠️', color: 'text-red-500', premium: false },
+    { id: 'roadQuality', name: t('road_quality'), icon: '🛣️', color: 'text-orange-500', premium: true }
   ];
 
   const viewModes = [
-    { id: 'standard', name: 'Standard', icon: '🗺️' },
-    { id: 'satellite', name: 'Satellite', icon: '🛰️' },
-    { id: 'hybrid', name: 'Hybrid', icon: '🌍' },
-    { id: 'night', name: 'Night', icon: '🌙' }
+    { id: 'standard', name: t('standard'), icon: '🗺️' },
+    { id: 'satellite', name: t('satellite'), icon: '🛰️' },
+    { id: 'hybrid', name: t('hybrid'), icon: '🌍' },
+    { id: 'night', name: t('night'), icon: '🌙' }
   ];
 
   const handleLayerToggle = (layerId) => {
@@ -47,21 +50,21 @@ const SmartMap = ({ subscription }) => {
   };
 
   return (
-    <div className="animate-fade-in">
+    <div className="animate-fade-in pt-4 px-4 md:px-6">
       <div className="mb-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Smart Map</h1>
-            <p className="text-gray-400 mt-2">Intelligent mapping with real-time safety data and analytics</p>
+            <h1 className="text-3xl md:text-4xl font-bold">{t('smart_map')}</h1>
+            <p className="text-gray-400 mt-2">{t('interactive_maps')}</p>
           </div>
           <div className="mt-4 md:mt-0 flex items-center space-x-3">
             <AnimatedButton variant="outline">
               <FiDownload className="mr-2" />
-              Export Map
+              {t('export_map')}
             </AnimatedButton>
             <AnimatedButton>
               <FiShare2 className="mr-2" />
-              Share
+              {t('share')}
             </AnimatedButton>
           </div>
         </div>
@@ -70,7 +73,7 @@ const SmartMap = ({ subscription }) => {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         <div className="lg:col-span-1 space-y-8">
           <div className="bg-premium-card rounded-xl p-6">
-            <h3 className="text-lg font-semibold mb-6 text-gray-300">Map Layers</h3>
+            <h3 className="text-lg font-semibold mb-6 text-gray-300">{t('map_layers')}</h3>
             <div className="space-y-3">
               {mapLayersList.map((layer) => (
                 <div key={layer.id} className="flex items-center justify-between p-3 rounded-lg bg-gray-900/50">
@@ -110,7 +113,7 @@ const SmartMap = ({ subscription }) => {
           </div>
 
           <div className="bg-premium-card rounded-xl p-6">
-            <h3 className="text-lg font-semibold mb-6 text-gray-300">View Mode</h3>
+            <h3 className="text-lg font-semibold mb-6 text-gray-300">{t('view_mode')}</h3>
             <div className="grid grid-cols-2 gap-3">
               {viewModes.map((mode) => (
                 <button
@@ -130,7 +133,7 @@ const SmartMap = ({ subscription }) => {
           </div>
 
           <div className="bg-premium-card rounded-xl p-6">
-            <h3 className="text-lg font-semibold mb-4 text-gray-300">Live Map Data</h3>
+            <h3 className="text-lg font-semibold mb-4 text-gray-300">{t('live_map_data')}</h3>
             <div className="space-y-3">
               {Object.entries(liveData).map(([key, value]) => (
                 <div key={key} className="flex justify-between items-center p-3 rounded-lg bg-gray-900/50">
@@ -152,8 +155,8 @@ const SmartMap = ({ subscription }) => {
                     <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold">Live Interactive Map</h2>
-                    <p className="text-gray-400">Nairobi Metropolitan Area • Updated just now</p>
+                    <h2 className="text-xl font-bold">{t('live_interactive_map')}</h2>
+                    <p className="text-gray-400">Nairobi Metropolitan Area • {t('updated_just_now')}</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">
@@ -162,14 +165,14 @@ const SmartMap = ({ subscription }) => {
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Search location..."
+                      placeholder={t('search_location')}
                       className="pl-10 pr-4 py-2 bg-gray-900 border border-gray-800 rounded-lg focus:outline-none focus:border-njia-orange"
                     />
                     <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                   </div>
                   <AnimatedButton variant="secondary" size="small">
                     <FiTarget className="mr-2" />
-                    Locate Me
+                    {t('locate_me')}
                   </AnimatedButton>
                 </div>
               </div>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FiWifi, FiMessageSquare, FiAlertTriangle, FiUsers, FiShield, FiBell } from 'react-icons/fi';
 import AnimatedButton from '../components/AnimatedButton';
+import { useTranslation } from '../hooks/useTranslation';
 
 const SmartAppV2V = ({ subscription }) => {
   const [isConnected, setIsConnected] = useState(true);
@@ -10,6 +11,8 @@ const SmartAppV2V = ({ subscription }) => {
     { id: 2, user: 'Safety_Patrol', message: 'Road clear on Mombasa Road', time: '5 min ago', priority: 'medium' },
   ]);
   const [newMessage, setNewMessage] = useState('');
+  
+  const { t } = useTranslation();
 
   const handleSendMessage = () => {
     if (newMessage.trim() && subscription === 'premium') {
@@ -26,20 +29,20 @@ const SmartAppV2V = ({ subscription }) => {
   };
 
   return (
-    <div className="animate-fade-in">
+    <div className="animate-fade-in pt-4 px-4 md:px-6">
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Vehicle-to-Vehicle (V2V) Network</h1>
-            <p className="text-gray-400 mt-2">Real-time communication between vehicles for enhanced safety</p>
+            <h1 className="text-3xl font-bold">{t('v2v_connect')}</h1>
+            <p className="text-gray-400 mt-2">{t('vehicle_network')}</p>
           </div>
           <div className="flex items-center space-x-4">
             <div className={`flex items-center space-x-2 px-4 py-2 rounded-lg ${isConnected ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}`}>
               <div className={`w-2 h-2 rounded-full animate-pulse ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} />
-              <span>{isConnected ? 'Connected' : 'Disconnected'}</span>
+              <span>{isConnected ? t('connected') : t('disconnected')}</span>
             </div>
             <button onClick={() => setIsConnected(!isConnected)} className="px-4 py-2 bg-njia-darkblue rounded-lg hover:opacity-90 transition-opacity">
-              {isConnected ? 'Disconnect' : 'Connect'}
+              {isConnected ? t('disconnect') : t('connect')}
             </button>
           </div>
         </div>
@@ -50,8 +53,8 @@ const SmartAppV2V = ({ subscription }) => {
           <div className="bg-premium-card rounded-xl p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-lg font-semibold text-gray-300">Emergency Alert System</h3>
-                <p className="text-gray-400 text-sm">Broadcast alerts to nearby vehicles</p>
+                <h3 className="text-lg font-semibold text-gray-300">{t('emergency_alert_system')}</h3>
+                <p className="text-gray-400 text-sm">{t('broadcast_alerts')}</p>
               </div>
               <FiAlertTriangle className="text-njia-orange text-2xl" />
             </div>
@@ -62,7 +65,7 @@ const SmartAppV2V = ({ subscription }) => {
                   <div className={`p-3 rounded-full ${level === 'emergency' ? 'bg-red-500' : level === 'warning' ? 'bg-yellow-500' : 'bg-green-500'} mb-3`}>
                     {level === 'emergency' ? <FiAlertTriangle /> : level === 'warning' ? <FiBell /> : <FiWifi />}
                   </div>
-                  <span className="font-semibold capitalize">{level}</span>
+                  <span className="font-semibold capitalize">{t(level)}</span>
                 </button>
               ))}
             </div>
@@ -71,8 +74,8 @@ const SmartAppV2V = ({ subscription }) => {
           <div className="bg-premium-card rounded-xl p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-lg font-semibold text-gray-300">Live Message Board</h3>
-                <p className="text-gray-400 text-sm">Communicate with nearby vehicles</p>
+                <h3 className="text-lg font-semibold text-gray-300">{t('live_message_board')}</h3>
+                <p className="text-gray-400 text-sm">{t('communicate_nearby_vehicles')}</p>
               </div>
               <div className="flex items-center space-x-2">
                 <FiWifi className="text-njia-purple" />
@@ -100,10 +103,18 @@ const SmartAppV2V = ({ subscription }) => {
             </div>
 
             <div className="flex space-x-3">
-              <input type="text" value={newMessage} onChange={(e) => setNewMessage(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()} placeholder={subscription === 'premium' ? "Type your message..." : "Upgrade to Premium to send messages"} className="flex-1 px-4 py-3 bg-gray-900 border border-gray-800 rounded-lg focus:outline-none focus:border-njia-orange" disabled={subscription !== 'premium'} />
+              <input 
+                type="text" 
+                value={newMessage} 
+                onChange={(e) => setNewMessage(e.target.value)} 
+                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()} 
+                placeholder={subscription === 'premium' ? "Type your message..." : "Upgrade to Premium to send messages"} 
+                className="flex-1 px-4 py-3 bg-gray-900 border border-gray-800 rounded-lg focus:outline-none focus:border-njia-orange" 
+                disabled={subscription !== 'premium'} 
+              />
               <AnimatedButton onClick={handleSendMessage} disabled={subscription !== 'premium'}>
                 <FiMessageSquare className="mr-2" />
-                {subscription === 'premium' ? 'Send' : 'Premium Only'}
+                {subscription === 'premium' ? t('send') : 'Premium Only'}
               </AnimatedButton>
             </div>
           </div>
@@ -113,8 +124,8 @@ const SmartAppV2V = ({ subscription }) => {
           <div className="bg-premium-card rounded-xl p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-lg font-semibold text-gray-300">Nearby Vehicles</h3>
-                <p className="text-gray-400 text-sm">Connected in your network</p>
+                <h3 className="text-lg font-semibold text-gray-300">{t('nearby_vehicles')}</h3>
+                <p className="text-gray-400 text-sm">{t('connected_your_network')}</p>
               </div>
               <FiUsers className="text-njia-orange" />
             </div>
@@ -133,7 +144,9 @@ const SmartAppV2V = ({ subscription }) => {
                       <p className="text-sm text-gray-400">{vehicle.distance} away</p>
                     </div>
                   </div>
-                  <button className="px-3 py-1 text-xs bg-njia-darkblue rounded hover:opacity-90 transition-opacity">Connect</button>
+                  <button className="px-3 py-1 text-xs bg-njia-darkblue rounded hover:opacity-90 transition-opacity">
+                    {t('connect')}
+                  </button>
                 </div>
               ))}
             </div>
@@ -144,15 +157,15 @@ const SmartAppV2V = ({ subscription }) => {
             <div className="space-y-3">
               <div className="flex items-center space-x-2">
                 <FiShield className="text-green-500" />
-                <span>Encrypted Communication</span>
+                <span>{t('encrypted_communication')}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <FiWifi className="text-blue-500" />
-                <span>Real-time Data Sharing</span>
+                <span>{t('real_time_data_sharing')}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <FiBell className="text-njia-orange" />
-                <span>Emergency Alerts</span>
+                <span>{t('emergency_alerts')}</span>
               </div>
             </div>
             <div className="mt-6 pt-4 border-t border-white/20">
